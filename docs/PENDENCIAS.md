@@ -41,6 +41,18 @@ Lista viva de decisões do grupo (`TODO(equipe)`) e tipos novos. A IA não decid
 - **`check:regras`**: a checagem de seta (`→⇒➜➔⟶`) ficou restrita a link/botão (travessão e traço médio continuam valendo em qualquer texto — é a diferença que a seção 7 da paridade pede). Nova checagem: `--accent` nunca em `StatusChip`/`Alternativa`/`ComboMeter`/`ProgressToMinimum`/componente de barra de acerto (seção 4.3). Âmbar fora de `CriterioRecomendacao` passou a ler de `scripts/permite-ambar.txt` em vez de uma lista no próprio script. "Gamificação fora de escopo" não proíbe mais "conquista"/"medalha" (ficam atrás de `NEXT_PUBLIC_CONQUISTAS` na P3), mas passou a proibir também ranking/moeda/cor de metal (ouro/prata/bronze), que a seção 2 da paridade lista como sempre proibidos.
 - **Teste de a11y com corrida de verdade**: o teste "130% a 360px" rodava o axe logo depois de clicar num controle, sem esperar a transição de `color`/`background-color` (`--dur-controle`, 200ms, nova nesta etapa) assentar — o axe media a cor **no meio** da transição e achava contraste baixo num frame que não existe parado (nem o estado antes, nem o depois do clique). Corrigido com uma espera de 300ms antes do axe.
 
+**Taxa de acerto por área em "Seus números" (pedido à parte)**
+- Pedido do usuário olhando o Início: queria ver o percentual de acerto de cada matéria/área, não só o geral.
+  `ResumoGeral` ganhou o campo `porArea: { area, respondidas, acertos, taxaAcerto }[]` (sempre as 4 áreas, mock
+  calcula direto de `estado.tentativas` agrupando por `questao.area` — mesma lógica da taxa geral, só quebrada).
+  Renderizado como uma segunda linha dentro do mesmo painel "Seus números" (não um bloco novo), com `AreaTag` +
+  percentual; área sem nenhuma resposta ainda mostra "Sem dados" em vez de 0% (zero inventado seria enganoso).
+  **De propósito não é `Proficiencia`** (a estimativa do modelo, com intervalo/tendência) — a seção 6 (P2, item 2)
+  do prompt de paridade proíbe proficiência/desempenho agregado no Início, de propósito, porque isso é estatística
+  de verdade e fica reservado pro Perfil e pro Desempenho (com `dados_insuficientes` lá). "Taxa de acerto por área"
+  é só uma contagem simples (acertos/respondidas), mesma natureza do "Taxa de acerto" geral que seção 6 já
+  autorizava para esse painel — não viola a regra.
+
 **Histórico, resumo do simulado e Questões mais limpo (pedido à parte, não é uma etapa P\*)**
 - Pedido do usuário, com capturas do design de referência mostrando Questões, Simulados e Histórico; achamos que as
   mesmas telas já estavam especificadas em detalhe no canvas de identidade (`docs/identidade/referencia/Telas.dc.html`,

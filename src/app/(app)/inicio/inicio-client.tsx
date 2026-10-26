@@ -263,6 +263,20 @@ function PainelNumeros() {
             <p className="font-display text-2xl text-ink">{formatarNumero(data.sessoesConcluidas)}</p>
             <p className="text-xs text-ink-2">Treinos concluídos</p>
           </div>
+
+          {/* Mesma taxa de acerto de cima, quebrada por área — não é proficiência
+              (estimativa do modelo, com intervalo e tendência), que fica de fora
+              do Início de propósito (seção 6, P2, item 2). */}
+          <div className="col-span-2 grid grid-cols-2 gap-3 border-t border-rule p-4 sm:col-span-4 sm:grid-cols-4">
+            {data.porArea.map((item) => (
+              <div key={item.area} className="flex items-center justify-between gap-2">
+                <AreaTag area={item.area} />
+                <span className="font-display text-sm font-semibold text-ink">
+                  {item.taxaAcerto !== null ? formatarPercentual(item.taxaAcerto * 100) : "Sem dados"}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
       ) : null}
     </Bloco>

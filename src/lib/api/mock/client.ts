@@ -604,6 +604,18 @@ export const mockApi: Api = {
       const respondidasSemana = estado.tentativas.filter(
         (t) => new Date(t.correcao.respondidaEm) >= seteDiasAtras,
       ).length;
+
+      const porArea = (["LC", "CH", "CN", "MT"] as const).map((area) => {
+        const tentativasDaArea = estado.tentativas.filter((t) => questaoPorId(t.questaoId)?.questao.area === area);
+        const acertosDaArea = tentativasDaArea.filter((t) => t.correcao.correta).length;
+        return {
+          area,
+          respondidas: tentativasDaArea.length,
+          acertos: acertosDaArea,
+          taxaAcerto: tentativasDaArea.length > 0 ? acertosDaArea / tentativasDaArea.length : null,
+        };
+      });
+
       return {
         respondidas,
         acertos,
@@ -612,6 +624,7 @@ export const mockApi: Api = {
         simuladosConcluidos: Object.values(estado.simulados).filter((s) => s.status === "finalizado").length,
         sessoesConcluidas: Object.values(estado.sessoes).filter((s) => s.sessao.encerradaEm !== null).length,
         respondidasSemana,
+        porArea,
       } satisfies ResumoGeral;
     });
   },

@@ -248,6 +248,10 @@ export interface ResumoGeral {
   simuladosConcluidos: number;
   sessoesConcluidas: number;
   respondidasSemana: number;
+  // Taxa de acerto por área (P2, "Seus números") — mesma métrica simples do
+  // resumo geral, só quebrada por área; não é proficiência (que é estimativa
+  // do modelo, com intervalo e tendência, e fica fora do Início de propósito).
+  porArea: { area: Area; respondidas: number; acertos: number; taxaAcerto: number | null }[];
 }
 
 /** Até 3 no Início, "Continue de onde parou" (P2). */
