@@ -59,6 +59,10 @@ Lista viva de decisões do grupo (`TODO(equipe)`) e tipos novos. A IA não decid
   entre `/desempenho/[area]`; selecionar um assunto troca a tabela de habilidades; "Treinar {assunto}, N questões"
   inicia sessão de verdade e navega pro treino (inclusive o aviso de "questões elegíveis acabaram" quando o assunto
   tem poucas questões cadastradas — fallback já existente no motor, não um bug novo); funciona em mobile (375px).
+- **Teste e2e desatualizado, achado pela própria suíte**: `e2e/questoes.spec.ts` esperava o texto literal "60
+  questões encontradas" (o total antigo do banco de demonstração) — corrigido pra "400", acompanhando o
+  `TOTAL_QUESTOES_DEMO` novo. `npm run audit:contraste` (zero falhas, 5 paletas × 2 temas, incluindo `/desempenho` e
+  `/desempenho/MT`), `test:a11y` (116) e `test:e2e` (218) rodados de verdade depois do conserto — tudo passando.
 
 **Taxa de acerto por área em "Seus números" (pedido à parte)**
 - Pedido do usuário olhando o Início: queria ver o percentual de acerto de cada matéria/área, não só o geral.

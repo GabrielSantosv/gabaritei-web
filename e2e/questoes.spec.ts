@@ -15,7 +15,9 @@ test.describe("Banco de questões", () => {
 
   test("lista questões e os filtros ficam na URL", async ({ page }) => {
     await page.goto("/questoes");
-    await expect(page.getByText(/60 questões encontradas/)).toBeVisible();
+    // 400 = TOTAL_QUESTOES_DEMO (lib/api/mock/dados.ts) — cresceu pra dar volume
+    // de demonstração suficiente pro agrupamento por assunto do Desempenho.
+    await expect(page.getByText(/400 questões encontradas/)).toBeVisible();
 
     await page.getByRole("checkbox", { name: /Matemática/ }).click();
     await page.waitForURL(/areas=MT/);
