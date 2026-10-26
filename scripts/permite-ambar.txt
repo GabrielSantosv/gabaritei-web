@@ -1,0 +1,6 @@
+# Arquivos autorizados a usar --amber/amber-* (docs/FRONTEND_PARIDADE.md, seção 2:
+# "âmbar exclusivo de conteúdo de IA"). Um caminho relativo a src/ por linha.
+# tokens.css/globals.css: é onde --amber é definido, não "usado" no sentido da regra.
+styles/tokens.css
+styles/globals.css
+components/dominio/criterio-recomendacao.tsx

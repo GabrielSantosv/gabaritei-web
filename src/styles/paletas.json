@@ -1,0 +1,172 @@
+{
+  "floresta": {
+    "light": {
+      "paper": "#F4F2EC",
+      "paper-2": "#ECE9E0",
+      "card": "#FBFAF7",
+      "ink": "#1D2420",
+      "ink-2": "#4B554E",
+      "rule-strong": "#8F8A7A",
+      "brand": "#2C6E49",
+      "brand-hover": "#245C3C",
+      "brand-soft": "#E3ECE4",
+      "brand-ink": "#245C3C",
+      "on-brand": "#FFFFFF",
+      "accent": "#2C6E49",
+      "accent-ink": "#245C3C",
+      "accent-soft": "#E3ECE4"
+    },
+    "dark": {
+      "paper": "#121714",
+      "paper-2": "#1E2622",
+      "card": "#1A211D",
+      "ink": "#E9EBE4",
+      "ink-2": "#A9B3AC",
+      "rule-strong": "#6A7370",
+      "brand": "#6BBE90",
+      "brand-hover": "#82CBA3",
+      "brand-soft": "#24342B",
+      "brand-ink": "#6BBE90",
+      "on-brand": "#0E1A13",
+      "accent": "#6BBE90",
+      "accent-ink": "#6BBE90",
+      "accent-soft": "#24342B"
+    }
+  },
+  "oceano": {
+    "light": {
+      "paper": "#EDF2F4",
+      "paper-2": "#E2EAEE",
+      "card": "#F7FAFB",
+      "ink": "#14262C",
+      "ink-2": "#44575E",
+      "rule-strong": "#728890",
+      "brand": "#1E6C7A",
+      "brand-hover": "#17555F",
+      "brand-soft": "#DCEAED",
+      "brand-ink": "#17555F",
+      "on-brand": "#F7FAFB",
+      "accent": "#1E6C7A",
+      "accent-ink": "#17555F",
+      "accent-soft": "#DCEAED"
+    },
+    "dark": {
+      "paper": "#0F1A1E",
+      "paper-2": "#172529",
+      "card": "#132127",
+      "ink": "#E4EEF0",
+      "ink-2": "#A3B5BA",
+      "rule-strong": "#668087",
+      "brand": "#5BB8C6",
+      "brand-hover": "#7CC8D3",
+      "brand-soft": "#1C3A41",
+      "brand-ink": "#5BB8C6",
+      "on-brand": "#0F1A1E",
+      "accent": "#5BB8C6",
+      "accent-ink": "#5BB8C6",
+      "accent-soft": "#1C3A41"
+    }
+  },
+  "terracota": {
+    "light": {
+      "paper": "#F6F0EA",
+      "paper-2": "#EDE4DB",
+      "card": "#FCF9F6",
+      "ink": "#2B1F18",
+      "ink-2": "#5A4A40",
+      "rule-strong": "#8F7C6C",
+      "brand": "#A5481F",
+      "brand-hover": "#8A3B18",
+      "brand-soft": "#F3E1D5",
+      "brand-ink": "#8A3B18",
+      "on-brand": "#FCF9F6",
+      "accent": "#A5481F",
+      "accent-ink": "#8A3B18",
+      "accent-soft": "#F3E1D5"
+    },
+    "dark": {
+      "paper": "#1A130F",
+      "paper-2": "#261C16",
+      "card": "#211812",
+      "ink": "#F2E9E1",
+      "ink-2": "#BBA99B",
+      "rule-strong": "#7E6C5E",
+      "brand": "#E58A57",
+      "brand-hover": "#EEA27A",
+      "brand-soft": "#3A2418",
+      "brand-ink": "#E58A57",
+      "on-brand": "#1A130F",
+      "accent": "#E58A57",
+      "accent-ink": "#E58A57",
+      "accent-soft": "#3A2418"
+    }
+  },
+  "brasa": {
+    "light": {
+      "paper": "#F2F1EF",
+      "paper-2": "#E8E6E3",
+      "card": "#FAFAF8",
+      "ink": "#171717",
+      "ink-2": "#474543",
+      "rule-strong": "#85817C",
+      "brand": "#1F1F1F",
+      "brand-hover": "#3A3A3A",
+      "brand-soft": "#E6E4E1",
+      "brand-ink": "#1F1F1F",
+      "on-brand": "#FAFAF8",
+      "accent": "#C42B2B",
+      "accent-ink": "#9E1F1F",
+      "accent-soft": "#F6DCDC"
+    },
+    "dark": {
+      "paper": "#0F0F0F",
+      "paper-2": "#1A1A1A",
+      "card": "#151515",
+      "ink": "#F1F0EE",
+      "ink-2": "#B2AFAB",
+      "rule-strong": "#6E6B67",
+      "brand": "#F1F0EE",
+      "brand-hover": "#FFFFFF",
+      "brand-soft": "#262626",
+      "brand-ink": "#F1F0EE",
+      "on-brand": "#0F0F0F",
+      "accent": "#F0646A",
+      "accent-ink": "#F28A8F",
+      "accent-soft": "#3A1517"
+    }
+  },
+  "sol": {
+    "light": {
+      "paper": "#F6F3EA",
+      "paper-2": "#EDE8D8",
+      "card": "#FCFAF3",
+      "ink": "#1F1D14",
+      "ink-2": "#55503E",
+      "rule-strong": "#8C8467",
+      "brand": "#26241A",
+      "brand-hover": "#3C3A2C",
+      "brand-soft": "#ECE8D6",
+      "brand-ink": "#26241A",
+      "on-brand": "#FCFAF3",
+      "accent": "#8A6A00",
+      "accent-ink": "#6B5200",
+      "accent-soft": "#F7E7A8"
+    },
+    "dark": {
+      "paper": "#14130D",
+      "paper-2": "#201E14",
+      "card": "#1B1A11",
+      "ink": "#F3F0E2",
+      "ink-2": "#B8B29A",
+      "rule-strong": "#7A7452",
+      "brand": "#F3F0E2",
+      "brand-hover": "#FFFFFF",
+      "brand-soft": "#2A2814",
+      "brand-ink": "#F3F0E2",
+      "on-brand": "#14130D",
+      "accent": "#E8C13A",
+      "accent-ink": "#EFD36E",
+      "accent-soft": "#3A3210"
+    }
+  }
+}

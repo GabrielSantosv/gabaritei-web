@@ -1,0 +1,240 @@
+@import "tailwindcss";
+@import "./tokens.css";
+@import "./paletas.generated.css";
+
+@theme {
+  /* cores: mapeiam para as variáveis de tokens.css, então bg-paper, text-ink etc. funcionam */
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-ink: var(--brand-ink);
+  --color-on-brand: var(--on-brand);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-amber-ink: var(--amber-ink);
+  --color-err: var(--err);
+  --color-err-soft: var(--err-soft);
+  --color-on-err: var(--on-err);
+  --color-area-mt: var(--area-mt);
+  --color-area-mt-soft: var(--area-mt-soft);
+  --color-area-cn: var(--area-cn);
+  --color-area-cn-soft: var(--area-cn-soft);
+  --color-area-ch: var(--area-ch);
+  --color-area-ch-soft: var(--area-ch-soft);
+  --color-area-lc: var(--area-lc);
+  --color-area-lc-soft: var(--area-lc-soft);
+  --color-focus: var(--focus);
+
+  /* tipografia: seção 6 — Source Serif 4 (editorial), IBM Plex Sans (interface), IBM Plex Mono (dados técnicos) */
+  --font-serif: var(--font-source-serif-4), ui-serif, serif;
+  --font-sans: var(--font-ibm-plex-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
+  /* Etapa V: fonte de título de tela e número grande, isolada à parte da marca/enunciado
+     (que continuam --font-serif direto) para o grupo poder trocar numa linha só. */
+  --font-display: var(--font-serif);
+
+  /* escala: 12, 14, 16, 18, 22, 28, 36 px (seção 6) */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.4;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.125rem; /* enunciado de questão */
+  --text-lg--line-height: 1.65;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.4;
+  --text-2xl: 1.75rem;
+  --text-2xl--line-height: 1.25;
+  --text-3xl: 2.25rem;
+  --text-3xl--line-height: 1.15;
+
+  /* raios: seção 6, aumentados na etapa V (item 3: painéis 16–20px, controles 12px) */
+  --radius-xs: 8px; /* folha, controles pequenos */
+  --radius-sm: 12px; /* botões, campos: "controles" */
+  --radius-md: 18px; /* painéis */
+  --radius-full: 999px; /* tags, bolhas do cartão-resposta */
+}
+
+@layer base {
+  * {
+    border-color: var(--rule);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Tamanho do texto (Configuracoes, seção 6 da paridade): escala a raiz, então
+     toda a escala em rem (--text-xs a --text-3xl) acompanha proporcionalmente. */
+  html[data-tamanho-texto="115"] {
+    font-size: 115%;
+  }
+
+  html[data-tamanho-texto="130"] {
+    font-size: 130%;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    scrollbar-gutter: stable;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  table,
+  .tabular-nums,
+  time,
+  [data-mono] {
+    font-variant-numeric: tabular-nums;
+  }
+
+  button,
+  [role="button"],
+  a,
+  input,
+  select,
+  textarea,
+  summary {
+    touch-action: manipulation;
+  }
+
+  /* Regra 13 (seção 2): nada de outline: none sem substituto. Anel de foco sempre visível. */
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  /* Exceção documentada, escopada só a h1[tabindex="-1"] (etapa V, item 8a): FocoNoH1
+     chama h1.focus() em toda troca de rota (seção 8, foco não é automático no App
+     Router). Um h1 não interativo com tabindex=-1 nunca é alcançado pelo Tab — a
+     heurística de :focus-visible do navegador, porém, não distingue "foco programático
+     sem clique do usuário" de "navegação por teclado de verdade" nesse caso, e mostra o
+     anel mesmo quando a troca de rota veio de um clique de mouse. Não relaxa a regra
+     geral acima: todo elemento de verdade interativo continua com o anel. */
+  h1[tabindex="-1"]:focus-visible {
+    outline: none; /* check-regras: ignore, exceção documentada acima */
+  }
+
+  /* Seção 4.3: dentro da faixa principal (Início), o anel padrão (--focus,
+     que acompanha --brand) quase some no tema claro — o fundo da faixa
+     (--brand-hover) é a mesma família de verde. A seção pede --on-brand aqui
+     no claro; no escuro o --focus padrão já contrasta bem sobre --brand-soft,
+     sem precisar de troca. */
+  .faixa-principal :focus-visible {
+    outline-color: var(--on-brand);
+  }
+  [data-theme="dark"] .faixa-principal :focus-visible {
+    outline-color: var(--focus);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .faixa-principal :focus-visible {
+      outline-color: var(--focus);
+    }
+  }
+
+  /* Regra 10/13: 120–180ms ease-out em transform/opacity, some com reduced-motion.
+     Exceção da seção 2 da paridade: controles também transicionam color,
+     background-color e border-color, em --dur-controle (nunca layout, nunca
+     sombra, nunca transition: all). */
+  @media (prefers-reduced-motion: no-preference) {
+    .motion-safe-transition {
+      transition-property: transform, opacity, color, background-color, border-color;
+      transition-duration: 160ms, 160ms, var(--dur-controle), var(--dur-controle), var(--dur-controle);
+      transition-timing-function: ease-out, ease-out, var(--ease-controle), var(--ease-controle), var(--ease-controle);
+    }
+  }
+
+  /* Vale também com data-motion="reduzido" explícito, qualquer que seja a
+     preferência do SO (tokens.css) — animation: none (não só duração zero) volta
+     ao estilo base, então nada fica invisível esperando o "from" de um keyframe. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition-duration: 0ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer utilities {
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -3rem;
+    z-index: 50;
+    transition-property: transform, opacity;
+    transition-duration: 160ms;
+  }
+
+  .skip-link:focus-visible {
+    top: 1rem;
+  }
+
+  .no-scrollbar-x {
+    overflow-x: auto;
+  }
+
+  /* Único momento orquestrado do design system (seção 6): bolhas do cartão-resposta
+     entram em sequência no resultado do simulado, até 900ms no total. */
+  @keyframes cartao-entrada {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .cartao-entrada {
+    animation: cartao-entrada 200ms ease-out both;
+  }
+
+  /* Transição de página (seção 4.4): template.tsx em (app) e (publico), nunca em
+     (foco). Só opacidade, sem View Transitions API nem biblioteca. */
+  .pagina-in {
+    animation: pagina-in var(--dur-pagina) var(--ease-pagina) both;
+  }
+
+  /* Cascata de blocos de topo na entrada da rota (seção 4.4): --i é o índice do
+     bloco (0, 1, 2…); do 6º em diante entra junto com o 5º (min(i,5)). Só na
+     navegação/carga da página — nunca em atualização de dados, filtro ou aba. */
+  [data-reveal] {
+    animation: bloco-in var(--dur-bloco) var(--ease-bloco) both;
+    animation-delay: calc(min(var(--i, 0), 5) * var(--passo-bloco));
+  }
+
+  /* Esqueleto de carregamento (seção 4.4): pulsa em opacidade, nunca brilho
+     deslizante. Veja components/ui/skeleton.tsx — não usa animate-pulse do
+     Tailwind porque a duração/curva daqui são as do design system. */
+  .pulso {
+    animation: pulso 1.4s ease-in-out infinite;
+  }
+}

@@ -36,6 +36,22 @@ yarn-error.log*
 # vercel
 .vercel
 
+# testes e2e / auditoria
+/playwright-report/
+/test-results/
+/docs/mock-gerado.json
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# prompts e contexto de IA — decisão do grupo de não versionar (nem no
+# histórico; backup fora do repo). docs/PENDENCIAS.md continua versionado,
+# não é prompt.
+/.claude/
+/CLAUDE.md
+docs/*PROMPT*.md
+docs/FRONTEND_*.md
+docs/CONTEXTO_*.md
+docs/REFERENCIA_*.md
+docs/identidade/

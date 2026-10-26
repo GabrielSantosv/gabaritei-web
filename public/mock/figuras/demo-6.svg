@@ -1,0 +1,7 @@
+<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Figura de demonstração 6">
+  <rect width="320" height="180" fill="#ECE9E0"/>
+  <rect x="50" y="60" width="60" height="60" fill="#7D2E45"/>
+  <circle cx="200" cy="90" r="35" fill="#17665F"/>
+  <polygon points="250,130 280,70 310,130" fill="#9A4614"/>
+  <text x="160" y="25" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#1D2420">Figura de demonstração</text>
+</svg>

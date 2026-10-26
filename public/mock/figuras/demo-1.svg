@@ -1,0 +1,9 @@
+<svg viewBox="0 0 320 180" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Figura de demonstração 1">
+  <rect width="320" height="180" fill="#ECE9E0"/>
+  <rect x="30" y="110" width="40" height="50" fill="#3F5E8C"/>
+  <rect x="90" y="80" width="40" height="80" fill="#3F5E8C"/>
+  <rect x="150" y="50" width="40" height="110" fill="#3F5E8C"/>
+  <rect x="210" y="95" width="40" height="65" fill="#3F5E8C"/>
+  <line x1="20" y1="160" x2="300" y2="160" stroke="#8F8A7A" stroke-width="2"/>
+  <text x="160" y="25" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#1D2420">Gráfico de demonstração</text>
+</svg>

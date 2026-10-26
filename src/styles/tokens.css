@@ -1,0 +1,200 @@
+/*
+  Tokens do design system "geek e clean" (docs/FRONTEND_PROMPT.md, seção 6).
+  Valores calculados contra WCAG — mudar só com nova auditoria de contraste.
+
+  Paridade P1 (docs/FRONTEND_PARIDADE.md, seção 4.1): a identidade renomeada de
+  --forest* para --brand* (sem alias antigo), com --accent* novo (igual a --brand*
+  na paleta Floresta, que é a única definida aqui — as outras 4 ficam em
+  src/styles/paletas.generated.css, gerado por scripts/gerar-paletas.ts a partir de
+  src/styles/paletas.json). --focus aponta pra --brand pra acompanhar a paleta ativa.
+*/
+
+:root {
+  color-scheme: light;
+
+  /* superfícies */
+  --paper: #f4f2ec; /* fundo da página (off-white, nunca #FFF) */
+  --paper-2: #ece9e0; /* áreas rebaixadas: trilhas, cabeçalho de tabela */
+  --card: #fbfaf7; /* folha elevada: questão, painéis */
+
+  /* tinta */
+  --ink: #1d2420; /* texto principal   14,15:1 no paper */
+  --ink-2: #4b554e; /* texto secundário   6,93:1 no paper */
+  --rule: #d9d5c8; /* linhas DECORATIVAS (não usar em borda de campo) */
+  --rule-strong: #8f8a7a; /* bordas de campo e controle   3,08:1 */
+
+  /* identidade (paleta Floresta, a padrão — seção 4.1/4.2) */
+  --brand: #2c6e49; /* botão, barras, ícones   5,46:1 no paper */
+  --brand-hover: #245c3c;
+  --brand-soft: #e3ece4;
+  --brand-ink: #245c3c; /* texto verde (links, rótulos)   6,51:1 sobre brand-soft */
+  --on-brand: #ffffff; /* texto no botão   6,12:1 */
+
+  /* acento (seção 4.3): na Floresta é igual à marca — só ganha vida própria nas
+     outras paletas (Brasa vermelho, Sol amarelo). Nunca em bloco grande. */
+  --accent: #2c6e49;
+  --accent-ink: #245c3c;
+  --accent-soft: #e3ece4;
+
+  /* IA: exclusivo (regra 9) */
+  --amber: #b8842e; /* APENAS preenchimento, borda, ícone. 2,94:1, nunca texto */
+  --amber-soft: #f3e7cc;
+  --amber-ink: #6b4a10; /* texto de IA   7,18:1 no paper, 6,55:1 no amber-soft */
+
+  /* erro (e "errou") */
+  --err: #a8321f; /* 5,97:1 no paper */
+  --err-soft: #f5e1dc; /* texto --err sobre ele: 5,31:1 */
+  --on-err: #ffffff; /* 6,69:1 sobre --err */
+
+  /* áreas: só em tags, filetes finos e ladrilhos de seleção (etapa V) */
+  --area-mt: #3f5e8c;
+  --area-mt-soft: #e4eaf3; /* azul-ardósia */
+  --area-cn: #17665f;
+  --area-cn-soft: #dfeeec; /* verde-azulado */
+  --area-ch: #7d2e45;
+  --area-ch-soft: #f1e2e6; /* bordô */
+  --area-lc: #9a4614;
+  --area-lc-soft: #f6e6da; /* laranja queimado */
+
+  --focus: var(--brand); /* anel de foco: 2px + offset 2px */
+  --shadow-overlay: 0 8px 24px rgb(29 36 32 / 0.16);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #121714;
+  --paper-2: #1e2622;
+  --card: #1a211d;
+  --ink: #e9ebe4;
+  --ink-2: #a9b3ac;
+  --rule: #2c3530;
+  --rule-strong: #6a7370;
+  --brand: #6bbe90;
+  --brand-hover: #82cba3;
+  --brand-soft: #24342b;
+  --brand-ink: #6bbe90;
+  --on-brand: #0e1a13;
+  --accent: #6bbe90;
+  --accent-ink: #6bbe90;
+  --accent-soft: #24342b;
+  --amber: #d9a441;
+  --amber-soft: #323324;
+  --amber-ink: #e5b85a;
+  --err: #ee8f7f;
+  --err-soft: #332e29;
+  --on-err: #1a0f0c;
+  --area-mt: #8faad6;
+  --area-mt-soft: #283133;
+  --area-cn: #62b8af;
+  --area-cn-soft: #23332f;
+  --area-ch: #db93ab;
+  --area-ch-soft: #312f2e;
+  --area-lc: #e8975f;
+  --area-lc-soft: #332f25;
+  --focus: var(--brand);
+  --shadow-overlay: 0 8px 24px rgb(0 0 0 / 0.5);
+}
+
+/* Tema: atributo data-theme no <html>. Padrão = preferência do sistema;
+   o usuário pode forçar claro/escuro em Configurações. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #121714;
+    --paper-2: #1e2622;
+    --card: #1a211d;
+    --ink: #e9ebe4;
+    --ink-2: #a9b3ac;
+    --rule: #2c3530;
+    --rule-strong: #6a7370;
+    --brand: #6bbe90;
+    --brand-hover: #82cba3;
+    --brand-soft: #24342b;
+    --brand-ink: #6bbe90;
+    --on-brand: #0e1a13;
+    --accent: #6bbe90;
+    --accent-ink: #6bbe90;
+    --accent-soft: #24342b;
+    --amber: #d9a441;
+    --amber-soft: #323324;
+    --amber-ink: #e5b85a;
+    --err: #ee8f7f;
+    --err-soft: #332e29;
+    --on-err: #1a0f0c;
+    --area-mt: #8faad6;
+    --area-mt-soft: #283133;
+    --area-cn: #62b8af;
+    --area-cn-soft: #23332f;
+    --area-ch: #db93ab;
+    --area-ch-soft: #312f2e;
+    --area-lc: #e8975f;
+    --area-lc-soft: #332f25;
+    --focus: var(--brand);
+    --shadow-overlay: 0 8px 24px rgb(0 0 0 / 0.5);
+  }
+}
+
+/* prefers-contrast: more aumenta --rule para --rule-strong (regra 6, seção 6) */
+@media (prefers-contrast: more) {
+  :root {
+    --rule: var(--rule-strong);
+  }
+}
+
+/* Movimento (docs/FRONTEND_PARIDADE.md, seção 4.4). --ease-spring é gerado por
+   scripts/gerar-mola.ts (oscilador harmônico amortecido) — não escreva à mão. */
+:root {
+  --dur-pagina: 340ms;
+  --ease-pagina: cubic-bezier(0.2, 0, 0, 1);
+  --dur-bloco: 360ms;
+  --ease-bloco: cubic-bezier(0.22, 1, 0.36, 1);
+  --passo-bloco: 70ms;
+  --dur-controle: 200ms;
+  --ease-controle: ease-out;
+  --dur-troca: 160ms;
+  /* gerar-mola:inicio */
+  --ease-spring: linear(0.0000, 0.0460, 0.1567, 0.2993, 0.4499, 0.5928, 0.7185, 0.8225, 0.9039, 0.9639, 1.0052, 1.0310, 1.0448, 1.0497, 1.0486, 1.0438, 1.0369, 1.0294, 1.0221, 1.0156, 1.0101, 1.0058, 1.0025, 1.0002, 0.9987, 0.9979, 0.9975, 0.9975, 0.9977, 0.9981, 0.9984, 0.9988, 1.0000); /* rigidez 170, amortecimento 18, massa 1 — scripts/gerar-mola.ts */
+  /* gerar-mola:fim */
+}
+
+@keyframes pagina-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes bloco-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pulso {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Preferência "Movimento" (Configuracoes): "reduzido" desliga tudo, igual a
+   prefers-reduced-motion: reduce (que também vale aqui, qualquer que seja o
+   data-motion — ver globals.css). Nenhuma peça fica invisível esperando animação:
+   animation: none (não só duração 0) volta ao estilo base, nunca ao "from" do keyframe. */
+html[data-motion="reduzido"] *,
+html[data-motion="reduzido"] *::before,
+html[data-motion="reduzido"] *::after {
+  animation: none !important;
+  transition-duration: 0ms !important;
+  scroll-behavior: auto !important;
+}
