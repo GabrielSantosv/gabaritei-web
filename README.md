@@ -1,36 +1,30 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gabaritei
 
-## Getting Started
+Plataforma de estudos adaptativos para o ENEM: treino por sessão, banco de questões com filtros, simulados no
+formato da prova, histórico de atividades e recomendações guiadas por um critério sempre explicado.
 
-First, run the development server:
+Construído em [Next.js](https://nextjs.org) (App Router) com TypeScript e Tailwind CSS. Nesta fase o front-end
+conversa com uma API simulada que roda inteiramente no navegador (`localStorage`), para desenvolvimento e
+demonstração sem depender do back-end.
+
+## Rodando localmente
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abra [http://localhost:3000](http://localhost:3000). A barra "Dados de demonstração" no topo e o seletor de cenário
+(canto inferior, em desenvolvimento) deixam claro que os dados são fictícios.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts úteis
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run test` — testes unitários (Vitest)
+- `npm run test:e2e` — testes ponta a ponta (Playwright)
+- `npm run test:a11y` — testes de acessibilidade (axe)
+- `npm run audit:contraste` / `npm run audit:paletas` — auditorias de contraste e paletas de cor
+- `npm run check:regras` — varredura estática das regras de design do projeto
 
-## Learn More
+## Deploy
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Compatível com deploy direto na [Vercel](https://vercel.com/new).
