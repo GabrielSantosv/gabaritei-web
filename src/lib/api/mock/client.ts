@@ -6,6 +6,9 @@ import {
   type AtividadeEmAndamento,
   type ComboEstado,
   type Correcao,
+  type DesempenhoArea,
+  type DesempenhoAssunto,
+  type DesempenhoHabilidade,
   type EnvioResposta,
   type EnvioResultado,
   type FiltrosHistorico,
@@ -15,6 +18,8 @@ import {
   type Letra,
   type Marcacao,
   type Pagina,
+  type PeriodoDesempenho,
+  type Tendencia,
   type ParamsSessao,
   type ParamsSessaoAuto,
   type PedidoRecomendacao,
@@ -35,7 +40,7 @@ import {
   type Tentativa,
 } from "../types";
 import { truncarNaPalavra } from "@/lib/format";
-import { BANCO_DEMO, HABILIDADES, questaoPorId } from "./dados";
+import { assuntosDaArea, BANCO_DEMO, habilidadesDaArea, HABILIDADES, MIN_RESPOSTAS_TENDENCIA, questaoPorId } from "./dados";
 import { comLatenciaECenario, garantirCenarioSemeado } from "./cenarios";
 import {
   calcularFoguinho,
@@ -73,6 +78,25 @@ const NOME_AREA: Record<Area, string> = {
 };
 
 /** "Continue de onde parou" (P2): um nome curto pra sessão, pelo que ela foi pedida. */
+/**
+ * Tendência (Desempenho, pedido à parte): divide as tentativas (já dentro do
+ * período) em metade mais antiga e mais recente por data e compara a taxa de
+ * acerto das duas. Abaixo de MIN_RESPOSTAS_TENDENCIA respostas, não há dado
+ * suficiente pra dizer nada — volta null ("Poucos dados" na tela).
+ */
+function calcularTendencia(tentativas: Tentativa[]): Tendencia | null {
+  if (tentativas.length < MIN_RESPOSTAS_TENDENCIA) return null;
+  const ordenadas = [...tentativas].sort((a, b) => a.correcao.respondidaEm.localeCompare(b.correcao.respondidaEm));
+  const meio = Math.floor(ordenadas.length / 2);
+  const antes = ordenadas.slice(0, meio);
+  const depois = ordenadas.slice(meio);
+  const taxa = (lista: Tentativa[]) => lista.filter((t) => t.correcao.correta).length / lista.length;
+  const diferenca = taxa(depois) - taxa(antes);
+  if (diferenca >= 0.1) return "subindo";
+  if (diferenca <= -0.1) return "caindo";
+  return "estavel";
+}
+
 function tituloDaSessao(s: SessaoInterna): string {
   if (s.pedido.modo === "tema" && s.pedido.temaTexto) return `Tema: ${s.pedido.temaTexto}`;
   if (s.pedido.modo === "habilidade" && s.pedido.habilidade) return `Habilidade ${s.pedido.habilidade}`;
@@ -564,6 +588,79 @@ export const mockApi: Api = {
     });
   },
 
+  async obterDesempenho(area: Area, periodo: PeriodoDesempenho) {
+    return comLatenciaECenario(() => {
+      const estado = lerEstado();
+
+      let tentativas = estado.tentativas.filter((t) => questaoPorId(t.questaoId)?.questao.area === area);
+      if (periodo !== "tudo") {
+        const corte = new Date();
+        corte.setDate(corte.getDate() - Number(periodo));
+        tentativas = tentativas.filter((t) => new Date(t.correcao.respondidaEm) >= corte);
+      }
+
+      const respondidas = tentativas.length;
+      const acertos = tentativas.filter((t) => t.correcao.correta).length;
+
+      const assuntos: DesempenhoAssunto[] = assuntosDaArea(area).map((def) => {
+        const habilidadesDoAssunto = habilidadesDaArea(area).filter((h) => h.assunto === def.nome);
+        const codigosDoAssunto = habilidadesDoAssunto.map((h) => h.codigo);
+
+        const habilidades: DesempenhoHabilidade[] = habilidadesDoAssunto.map((h) => {
+          const tentativasDaHabilidade = tentativas.filter(
+            (t) => questaoPorId(t.questaoId)?.questao.habilidade?.codigo === h.codigo,
+          );
+          const acertosDaHabilidade = tentativasDaHabilidade.filter((t) => t.correcao.correta).length;
+          return {
+            habilidade: h,
+            respondidas: tentativasDaHabilidade.length,
+            acertos: acertosDaHabilidade,
+            taxaAcerto: tentativasDaHabilidade.length > 0 ? acertosDaHabilidade / tentativasDaHabilidade.length : null,
+            tendencia: calcularTendencia(tentativasDaHabilidade),
+          } satisfies DesempenhoHabilidade;
+        });
+
+        const tentativasDoAssunto = tentativas.filter((t) => {
+          const codigo = questaoPorId(t.questaoId)?.questao.habilidade?.codigo;
+          return codigo && codigosDoAssunto.includes(codigo);
+        });
+        const acertosDoAssunto = tentativasDoAssunto.filter((t) => t.correcao.correta).length;
+
+        return {
+          nome: def.nome,
+          habilidades,
+          respondidas: tentativasDoAssunto.length,
+          acertos: acertosDoAssunto,
+          taxaAcerto: tentativasDoAssunto.length > 0 ? acertosDoAssunto / tentativasDoAssunto.length : null,
+          tendencia: calcularTendencia(tentativasDoAssunto),
+          maisFraco: false,
+        } satisfies DesempenhoAssunto;
+      });
+
+      // Do que mais erra pro que mais acerta; assuntos com poucos dados ficam no fim.
+      assuntos.sort((a, b) => {
+        const aPoucos = a.respondidas < MIN_RESPOSTAS_TENDENCIA;
+        const bPoucos = b.respondidas < MIN_RESPOSTAS_TENDENCIA;
+        if (aPoucos !== bPoucos) return aPoucos ? 1 : -1;
+        if (a.taxaAcerto === null || b.taxaAcerto === null) return 0;
+        return a.taxaAcerto - b.taxaAcerto;
+      });
+
+      const maisFraco = assuntos.find((a) => a.respondidas >= MIN_RESPOSTAS_TENDENCIA && a.taxaAcerto !== null) ?? null;
+      if (maisFraco) maisFraco.maisFraco = true;
+
+      return {
+        area,
+        periodo,
+        respondidas,
+        acertos,
+        taxaAcerto: respondidas > 0 ? acertos / respondidas : null,
+        assuntoMaisFraco: maisFraco ? { nome: maisFraco.nome, taxaAcerto: maisFraco.taxaAcerto!, respondidas: maisFraco.respondidas } : null,
+        assuntos,
+      } satisfies DesempenhoArea;
+    });
+  },
+
   async obterReforco() {
     return comLatenciaECenario(() => {
       const estado = lerEstado();
@@ -893,10 +990,7 @@ function montarResultadoSimulado(simulado: Simulado, tentativas: TentativaRegist
     .filter(([, v]) => v.total > 0 && v.acertos / v.total < 0.5)
     .map(([codigo, v]) => ({
       area: v.area,
-      habilidade: questaoPorId(itens.find((i) => i.habilidade === codigo)?.questaoId ?? "")?.questao.habilidade ?? {
-        codigo,
-        descricao: null,
-      },
+      habilidade: HABILIDADES.find((h) => h.codigo === codigo) ?? { codigo, descricao: null, area: v.area, assunto: "" },
       acertos: v.acertos,
       total: v.total,
     }));

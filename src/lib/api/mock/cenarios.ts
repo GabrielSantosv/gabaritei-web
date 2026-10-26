@@ -216,7 +216,10 @@ export function semearCenario(cenario: CenarioId): void {
       return;
     }
     if (cenario === "ativo") {
-      estado.tentativas = gerarTentativasSinteticas(0.68, MOCK_MIN_RESPOSTAS + 8, 45);
+      // Volume maior que antes (65+ por área): o banco cresceu de 6 pra ~18
+      // habilidades por área (Desempenho, pedido à parte) e precisa de dado
+      // o bastante espalhado pra cada assunto não ficar em "poucos dados".
+      estado.tentativas = gerarTentativasSinteticas(0.68, 70, 90);
       estado.diasComAtividade = diasConsecutivos(5);
       estado.melhorFoguinho = 9;
 

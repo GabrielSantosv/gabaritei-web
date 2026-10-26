@@ -43,6 +43,7 @@ export const httpApi: Api = {
   obterReforco: async () => indisponivel(),
   obterRegularidade: async () => indisponivel(),
   obterResumoGeral: async () => indisponivel(),
+  obterDesempenho: async () => indisponivel(),
 
   listarSimulados: async () => indisponivel(),
   criarSimulado: async () => indisponivel(),

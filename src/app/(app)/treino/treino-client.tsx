@@ -16,6 +16,8 @@ import { Segmented } from "@/components/ui/segmented";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getApi } from "@/lib/api/client";
 import { mensagemDoErro } from "@/lib/api/errors";
+import { cn } from "@/lib/cn";
+import { formatarPercentual } from "@/lib/format";
 import type { Area, PedidoRecomendacao } from "@/lib/api/types";
 import { limparDescricaoHabilidadeMock } from "@/lib/questoes-filtros";
 import { revelar } from "@/lib/reveal";
@@ -45,6 +47,7 @@ function EscolherModo() {
     return a && AREAS.includes(a as Area) ? [a as Area] : [];
   });
   const [habilidade, setHabilidade] = useState<string | null>(searchParams.get("habilidade"));
+  const [assunto, setAssunto] = useState<string | null>(searchParams.get("assunto"));
   const [temaTexto, setTemaTexto] = useState("");
   const [quantidade, setQuantidade] = useState(10);
   const [iniciando, setIniciando] = useState(false);
@@ -56,6 +59,24 @@ function EscolherModo() {
     queryFn: () => getApi().obterProficiencias(),
   });
   const { data: resumoGeral } = useQuery({ queryKey: ["resumo-geral"], queryFn: () => getApi().obterResumoGeral() });
+
+  // Assunto (Desempenho, pedido à parte): só faz sentido com exatamente uma
+  // área escolhida — o mesmo nome de assunto não existe nas outras áreas.
+  const areaUnica = areas.length === 1 ? areas[0] : null;
+  const { data: desempenhoArea } = useQuery({
+    queryKey: ["desempenho", areaUnica, "tudo"],
+    queryFn: () => getApi().obterDesempenho(areaUnica as Area, "tudo"),
+    enabled: areaUnica !== null,
+  });
+  const assuntoSelecionado = areaUnica ? (desempenhoArea?.assuntos.find((a) => a.nome === assunto) ?? null) : null;
+  // Troca de área (ou deixou de ser uma área só): o assunto da área antiga
+  // não existe mais pra escolher — limpa assim que detecta, igual ao padrão
+  // já usado abaixo pra habilidade/modo.
+  const [areaDoAssuntoLimpo, setAreaDoAssuntoLimpo] = useState(areaUnica);
+  if (areaUnica !== areaDoAssuntoLimpo) {
+    setAreaDoAssuntoLimpo(areaUnica);
+    if (assunto) setAssunto(null);
+  }
 
   const semHistorico = resumoGeral ? resumoGeral.respondidas === 0 : false;
 
@@ -72,6 +93,13 @@ function EscolherModo() {
   const motivoHabilidade = reforco
     ? `Disponível depois de ${reforco.respostasMinimas} respostas. Faltam ${Math.max(0, reforco.respostasMinimas - reforco.respostasAtuais)}.`
     : undefined;
+  // Assunto (Desempenho, pedido à parte): mostra pra onde o reforço aponta
+  // agora, já com o nome do assunto da habilidade — só decorativo, não muda o
+  // pedido (quem muda o pedido é a escolha de verdade na Combobox/ladrilhos).
+  const prioridadeTopo = reforco?.prioridades[0];
+  const motivoHabilidadeDisponivel = prioridadeTopo
+    ? `Disponível. Reforço indicado agora: ${prioridadeTopo.habilidade.codigo} de ${ROTULO_AREA[prioridadeTopo.area]}, em ${prioridadeTopo.habilidade.assunto}.`
+    : "Disponível.";
 
   const nivelDisponivel = proficiencias?.some((p) => p.status === "ok") ?? false;
   const motivoNivel = proficiencias
@@ -91,15 +119,25 @@ function EscolherModo() {
     if (!habilidade && reforco.prioridades[0]) setHabilidade(reforco.prioridades[0].habilidade.codigo);
   }
 
+  // Assunto (Desempenho, pedido à parte): se a habilidade escolhida pertence
+  // ao assunto, vale ela sozinha; senão, vale o assunto inteiro (qualquer
+  // habilidade dele) — funciona pra qualquer modo, não só "Por habilidade".
+  const codigosDoAssunto = assuntoSelecionado ? assuntoSelecionado.habilidades.map((h) => h.habilidade.codigo) : null;
+  const habilidadeValida =
+    modo === "habilidade" && habilidade && (!codigosDoAssunto || codigosDoAssunto.includes(habilidade))
+      ? habilidade
+      : null;
+
   const pedido: PedidoRecomendacao = useMemo(
     () => ({
       modo,
       areas: areas.length ? areas : undefined,
-      habilidade: modo === "habilidade" ? (habilidade ?? undefined) : undefined,
+      habilidade: habilidadeValida ?? undefined,
+      habilidades: !habilidadeValida && codigosDoAssunto ? codigosDoAssunto : undefined,
       temaTexto: modo === "tema" && temaTexto ? temaTexto : undefined,
       quantidade: 1,
     }),
-    [modo, areas, habilidade, temaTexto],
+    [modo, areas, habilidadeValida, codigosDoAssunto, temaTexto],
   );
 
   const { data: previa, isFetching: carregandoPrevia } = useQuery({
@@ -109,12 +147,14 @@ function EscolherModo() {
 
   const opcoesHabilidade = useMemo(
     () =>
-      (reforco?.prioridades ?? []).map((p) => ({
-        valor: p.habilidade.codigo,
-        rotulo: `${p.habilidade.codigo}: ${limparDescricaoHabilidadeMock(p.habilidade.descricao) ?? "sem descrição"}`,
-        grupo: ROTULO_AREA[p.area],
-      })),
-    [reforco],
+      (reforco?.prioridades ?? [])
+        .filter((p) => !codigosDoAssunto || codigosDoAssunto.includes(p.habilidade.codigo))
+        .map((p) => ({
+          valor: p.habilidade.codigo,
+          rotulo: `${p.habilidade.codigo}: ${limparDescricaoHabilidadeMock(p.habilidade.descricao) ?? "sem descrição"}`,
+          grupo: ROTULO_AREA[p.area],
+        })),
+    [reforco, codigosDoAssunto],
   );
 
   async function aoComecar() {
@@ -124,7 +164,8 @@ function EscolherModo() {
       const { sessao, primeira } = await getApi().iniciarSessao({
         modo,
         areas: areas.length ? areas : undefined,
-        habilidade: modo === "habilidade" ? (habilidade ?? undefined) : undefined,
+        habilidade: habilidadeValida ?? undefined,
+        habilidades: !habilidadeValida && codigosDoAssunto ? codigosDoAssunto : undefined,
         temaTexto: modo === "tema" && temaTexto ? temaTexto : undefined,
         quantidade,
       });
@@ -165,7 +206,7 @@ function EscolherModo() {
               titulo="Por habilidade"
               descricao="Foco nas habilidades em que você mais precisa melhorar."
               disabled={!habilidadeDisponivel}
-              motivo={!habilidadeDisponivel ? motivoHabilidade : undefined}
+              motivo={!habilidadeDisponivel ? motivoHabilidade : motivoHabilidadeDisponivel}
               Icone={Target}
             />
 
@@ -208,6 +249,55 @@ function EscolherModo() {
             </div>
           </fieldset>
 
+          {/* Assunto (Desempenho, pedido à parte): só aparece com uma única área
+              escolhida — o nome do assunto não existe nas outras. Opcional, sem
+              escolha vale a área toda. */}
+          {areaUnica && desempenhoArea ? (
+            <fieldset>
+              <legend className="mb-1 text-sm font-medium text-ink">Assunto de {ROTULO_AREA[areaUnica]}</legend>
+              <p className="mb-2 text-sm text-ink-2">Opcional. Aparece quando você escolhe uma única área. Sem escolha, vale a área toda.</p>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <button
+                  type="button"
+                  aria-pressed={assunto === null}
+                  onClick={() => setAssunto(null)}
+                  className={cn(
+                    "flex min-h-16 flex-col items-start gap-1 rounded-sm border-2 p-3 text-left motion-safe-transition",
+                    assunto === null ? "border-brand bg-brand-soft" : "border-transparent bg-paper-2",
+                  )}
+                >
+                  <span className="text-sm font-medium text-ink">Todos os assuntos</span>
+                  <span className="text-xs text-ink-2">Vale a área toda</span>
+                </button>
+                {desempenhoArea.assuntos.map((a) => (
+                  <button
+                    key={a.nome}
+                    type="button"
+                    aria-pressed={assunto === a.nome}
+                    onClick={() => {
+                      setAssunto(a.nome);
+                      if (habilidade && !a.habilidades.some((h) => h.habilidade.codigo === habilidade)) setHabilidade(null);
+                    }}
+                    className={cn(
+                      "flex min-h-16 flex-col items-start gap-1 rounded-sm border-2 p-3 text-left motion-safe-transition",
+                      assunto === a.nome ? "border-brand bg-brand-soft" : "border-transparent bg-paper-2",
+                    )}
+                  >
+                    <span className="flex items-center gap-2 text-sm font-medium text-ink">
+                      {a.nome}
+                      {a.maisFraco ? (
+                        <span className="rounded-full bg-paper px-2 py-0.5 text-xs font-medium text-ink-2">Mais fraco</span>
+                      ) : null}
+                    </span>
+                    <span className="text-xs text-ink-2">
+                      {a.tendencia === null ? "Poucos dados" : `${formatarPercentual((a.taxaAcerto ?? 0) * 100)} de acerto`}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
+
           <div>
             <p className="mb-2 text-sm font-medium text-ink">Quantidade de questões</p>
             <Segmented
@@ -232,6 +322,12 @@ function EscolherModo() {
               <dt className="text-ink-2">Áreas</dt>
               <dd className="text-ink">{areas.length ? areas.join(", ") : "Todas"}</dd>
             </div>
+            {assuntoSelecionado ? (
+              <div className="flex justify-between gap-2">
+                <dt className="text-ink-2">Assunto</dt>
+                <dd className="text-ink">{assuntoSelecionado.nome}</dd>
+              </div>
+            ) : null}
             <div className="flex justify-between gap-2">
               <dt className="text-ink-2">Quantidade</dt>
               <dd className="text-ink">{quantidade}</dd>

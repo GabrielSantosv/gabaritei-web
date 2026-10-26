@@ -43,6 +43,12 @@ export type Bloco =
 export interface Habilidade {
   codigo: string;
   descricao: string | null;
+  // Desempenho (pedido à parte, fora das etapas P*): a habilidade não guardava
+  // a própria área nem um agrupamento por assunto — precisava de ambos pra
+  // montar a tela de Desempenho (área > assunto > habilidade). Fecha a
+  // pendência já documentada em PENDENCIAS.md (decisão 6b).
+  area: Area;
+  assunto: string;
 } // ex.: 'H21'
 
 export interface Questao {
@@ -111,6 +117,10 @@ export interface PedidoRecomendacao {
   modo: "tema" | "habilidade" | "nivel" | "progressao";
   areas?: Area[];
   habilidade?: string;
+  // Treinar um assunto inteiro (Desempenho → "Treinar {assunto}, N questões"):
+  // qualquer habilidade da lista serve. Convive com `habilidade` (singular);
+  // se os dois vierem, `habilidade` ganha.
+  habilidades?: string[];
   temaTexto?: string;
   questaoBaseId?: string;
   quantidade?: number; // padrão 5
@@ -209,6 +219,8 @@ export interface ResumoSessao {
 }
 
 /** Progresso e perfil (RF09, RF10, RF17) */
+export type Tendencia = "subindo" | "estavel" | "caindo";
+
 export interface Proficiencia {
   area: Area;
   status: StatusDados;
@@ -217,8 +229,45 @@ export interface Proficiencia {
   respostasConsideradas: number;
   respostasMinimas: number;
   rotuloEscala: string; // TODO(equipe): que escala exibir (theta ou 0 a 1000)
-  tendencia: "subindo" | "estavel" | "caindo" | null;
+  tendencia: Tendencia | null;
   atualizadaEm: string | null;
+}
+
+export type PeriodoDesempenho = "7" | "30" | "90" | "tudo";
+
+/**
+ * Desempenho por área (pedido à parte, fora das etapas P*): diferente de
+ * `Proficiencia` (estimativa do modelo, com intervalo), isto é contagem
+ * simples — respondidas/acertos/taxa — só que quebrada por assunto e
+ * habilidade dentro da área escolhida.
+ */
+export interface DesempenhoHabilidade {
+  habilidade: Habilidade;
+  respondidas: number;
+  acertos: number;
+  taxaAcerto: number | null;
+  // null = respostas de menos pra apontar tendência (regra: mín. de respostas).
+  tendencia: Tendencia | null;
+}
+
+export interface DesempenhoAssunto {
+  nome: string;
+  habilidades: DesempenhoHabilidade[];
+  respondidas: number;
+  acertos: number;
+  taxaAcerto: number | null;
+  tendencia: Tendencia | null;
+  maisFraco: boolean;
+}
+
+export interface DesempenhoArea {
+  area: Area;
+  periodo: PeriodoDesempenho;
+  respondidas: number;
+  acertos: number;
+  taxaAcerto: number | null;
+  assuntoMaisFraco: { nome: string; taxaAcerto: number; respondidas: number } | null;
+  assuntos: DesempenhoAssunto[];
 }
 
 export interface Reforco {

@@ -12,7 +12,17 @@ import { expect, test } from "@playwright/test";
 const CENARIOS = ["novo", "ativo", "parcial", "esgotado", "lento"] as const;
 
 const ROTAS_PUBLICAS = ["/entrar", "/cadastrar", "/termos", "/privacidade", "/dev/componentes"];
-const ROTAS_AUTENTICADAS = ["/inicio", "/questoes", "/questoes/demo-003", "/treino", "/simulados", "/historico", "/perfil"];
+const ROTAS_AUTENTICADAS = [
+  "/inicio",
+  "/questoes",
+  "/questoes/demo-003",
+  "/treino",
+  "/simulados",
+  "/historico",
+  "/desempenho",
+  "/desempenho/MT",
+  "/perfil",
+];
 
 interface MensagemConsole {
   tipo: string;

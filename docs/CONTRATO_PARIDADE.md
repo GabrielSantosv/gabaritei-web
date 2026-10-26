@@ -34,6 +34,31 @@ real ainda não prometeu. Atualizada ao fim de cada etapa P*.
   `finalizar`, não inclui `diasEstudo` na chamada a `atualizarPreferencias`). Precisa de um campo novo no contrato
   antes de poder salvar de verdade.
 
+## Desempenho e Assunto no Treino (pedido à parte, imagem de referência)
+
+- **`Habilidade` ganhou `area: Area` e `assunto: string` obrigatórios** — fecha a pendência já documentada (decisão 6b
+  do PENDENCIAS.md: a habilidade não guardava a própria área). `assunto` é conceito novo, sem equivalente na seção 5
+  do prompt de paridade: o nível entre área e habilidade que a tela de Desempenho usa pra agrupar (ex.: Matemática →
+  Geometria → H47, H48, H49). **Lista de assuntos por área é só de exemplo** (`lib/api/mock/dados.ts`, `ASSUNTOS`),
+  inspirada nos eixos reais do ENEM mas não conferida com a Matriz de Referência oficial — mesmo aviso que já valia
+  pros códigos de habilidade. Evitamos propositalmente escrever "Competência N da Matriz do ENEM" na tela (apareceria
+  na imagem de referência) por não ter como confirmar o número de verdade — regra de não inventar dado (seção 2).
+- **`obterDesempenho(area, periodo)`** (mock): respondidas/acertos/taxa por área, por assunto e por habilidade, mais
+  tendência (metade mais antiga vs. mais recente das respostas do período, comparando taxa de acerto — "subindo" ⩾10
+  pontos percentuais, "caindo" ⩽-10, senão "estável"; menos de 5 respostas = sem tendência). Tudo client-side, a
+  partir de `estado.tentativas` — a API real provavelmente vai querer isso pré-calculado no back-end.
+- **`PedidoRecomendacao.habilidades?: string[]`** (plural, convive com `habilidade` singular): "treinar o assunto
+  inteiro" — filtro universal no motor (`engine.ts`), vale pra qualquer modo (tema, habilidade, nível, progressão),
+  não só "Por habilidade".
+- **Treino ganhou a seção "Assunto"**: só aparece com uma única área escolhida, ladrilhos com taxa de acerto (ou
+  "Poucos dados") e destaque "Mais fraco"; filtra a Combobox de habilidade, aparece no "Resumo do treino", e o
+  `motivo` do cartão "Por habilidade" agora cita assunto + habilidade do reforço atual.
+- **Banco de questões crescido** de 60 pra 400 (`TOTAL_QUESTOES_DEMO`) e habilidades de 6 pra ~14-18 por área, pra
+  cada assunto ter volume suficiente pra demonstração — mexe só em dado de mock, não no contrato.
+- **Rota nova `/desempenho`** (visão geral por área, nossa) e **`/desempenho/[area]`** (o detalhe, seguindo a imagem
+  de referência: filtros de área/período, indicadores, lista de assuntos ordenada do pior pro melhor, habilidades do
+  assunto selecionado). "Desempenho" entrou no menu principal e nas rotas protegidas.
+
 ## Histórico, resumo do simulado e Questões (pedido à parte, canvas de identidade)
 
 Fora da sequência P1–P5: o usuário pediu, com base no canvas de referência (`docs/identidade/referencia/Telas.dc.html`,

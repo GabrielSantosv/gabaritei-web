@@ -19,7 +19,7 @@ import type {
   Reforco,
   StatusDados,
 } from "../types";
-import { BANCO_DEMO, MOCK_MIN_RESPOSTAS, type QuestaoComGabarito } from "./dados";
+import { BANCO_DEMO, HABILIDADES, MOCK_MIN_RESPOSTAS, type QuestaoComGabarito } from "./dados";
 
 export const MODELO_MOCK = { nome: "mock", versao: "0.0.0" };
 
@@ -171,6 +171,17 @@ export function gerarRecomendacoes(
   }
 
   let candidatos = questoesDaArea(pedido.areas).filter((q) => !respondidasNaSessao.has(q.questao.id));
+
+  // Assunto (Desempenho/Treino, pedido à parte): filtro universal, vale pra
+  // qualquer modo — "treinar o assunto inteiro" restringe o banco de questões
+  // antes do critério de cada modo entrar (tema ainda busca por semelhança de
+  // texto, só que dentro do assunto; habilidade ainda escolhe uma prioridade,
+  // só que entre as do assunto).
+  if (!pedido.habilidade && pedido.habilidades && pedido.habilidades.length > 0) {
+    const codigosDoAssunto = pedido.habilidades;
+    candidatos = candidatos.filter((q) => q.questao.habilidade && codigosDoAssunto.includes(q.questao.habilidade.codigo));
+  }
+
   let aviso: Aviso | null = avisoSemHistorico;
   let faixaAlvo: Faixa | undefined;
   let habilidadeAlvo: Habilidade | null = null;
@@ -378,9 +389,11 @@ export function calcularReforco(tentativas: TentativaRegistrada[]): Reforco {
     prioridades: prioridades.map((p, i) => ({
       posicao: i + 1,
       area: p.area,
-      habilidade: BANCO_DEMO.find((q) => q.questao.habilidade?.codigo === p.habilidade)?.questao.habilidade ?? {
+      habilidade: HABILIDADES.find((h) => h.codigo === p.habilidade) ?? {
         codigo: p.habilidade,
         descricao: null,
+        area: p.area,
+        assunto: "",
       },
       taxaAcerto: p.taxaAcerto,
       respostas: p.respostas,

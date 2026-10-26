@@ -1,7 +1,9 @@
 import type {
   AbaHistorico,
+  Area,
   AtividadeEmAndamento,
   Correcao,
+  DesempenhoArea,
   EnvioResposta,
   EnvioResultado,
   FiltrosHistorico,
@@ -10,6 +12,7 @@ import type {
   ItemHistorico,
   Marcacao,
   Pagina,
+  PeriodoDesempenho,
   ParamsSessao,
   ParamsSessaoAuto,
   PedidoRecomendacao,
@@ -92,6 +95,7 @@ export interface Api {
   obterReforco(): Promise<Reforco>;
   obterRegularidade(): Promise<Regularidade>;
   obterResumoGeral(): Promise<ResumoGeral>;
+  obterDesempenho(area: Area, periodo: PeriodoDesempenho): Promise<DesempenhoArea>;
 
   // Simulado
   listarSimulados(): Promise<SimuladoResumo[]>;

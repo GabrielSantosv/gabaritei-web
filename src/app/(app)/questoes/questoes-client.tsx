@@ -27,7 +27,6 @@ import {
   FILTROS_PADRAO,
   filtrosParaQueryString,
   lerFiltrosDaUrl,
-  limparDescricaoHabilidadeMock,
   ordenarQuestoes,
   PAGINA_TAMANHO,
   paraFiltrosApi,
@@ -58,17 +57,6 @@ function intervaloDeAnos(de: number | null, ate: number | null): number[] {
 
 const ROTULO_AREA: Record<Area, string> = { LC: "Linguagens", CH: "Ciências Humanas", CN: "Ciências da Natureza", MT: "Matemática" };
 
-/**
- * O contrato (Habilidade) não guarda a área da habilidade — e os códigos
- * deveriam se repetir por área (H1 a H30 DENTRO de cada área, seção 3), não
- * ser globalmente únicos como no mock hoje. Por ora, agrupamos a Combobox
- * usando a área que o próprio mock escreve no fim da descrição (ver
- * lib/api/mock/dados.ts). TODO(equipe): ver docs/PENDENCIAS.md.
- */
-function areaDaDescricaoMock(descricao: string | null): string {
-  return descricao?.match(/\(([A-Z]{2})\)\s*$/)?.[1] ?? "Outras";
-}
-
 function toggle<T>(lista: T[], valor: T): T[] {
   return lista.includes(valor) ? lista.filter((v) => v !== valor) : [...lista, valor];
 }
@@ -86,8 +74,8 @@ function PainelFiltros({
     () =>
       habilidades.map((h) => ({
         valor: h.codigo,
-        rotulo: `${h.codigo}: ${limparDescricaoHabilidadeMock(h.descricao) ?? "sem descrição"}`,
-        grupo: ROTULO_AREA[areaDaDescricaoMock(h.descricao) as Area] ?? "Outras",
+        rotulo: `${h.codigo}: ${h.descricao ?? "sem descrição"}`,
+        grupo: ROTULO_AREA[h.area],
       })),
     [habilidades],
   );

@@ -41,6 +41,25 @@ Lista viva de decisões do grupo (`TODO(equipe)`) e tipos novos. A IA não decid
 - **`check:regras`**: a checagem de seta (`→⇒➜➔⟶`) ficou restrita a link/botão (travessão e traço médio continuam valendo em qualquer texto — é a diferença que a seção 7 da paridade pede). Nova checagem: `--accent` nunca em `StatusChip`/`Alternativa`/`ComboMeter`/`ProgressToMinimum`/componente de barra de acerto (seção 4.3). Âmbar fora de `CriterioRecomendacao` passou a ler de `scripts/permite-ambar.txt` em vez de uma lista no próprio script. "Gamificação fora de escopo" não proíbe mais "conquista"/"medalha" (ficam atrás de `NEXT_PUBLIC_CONQUISTAS` na P3), mas passou a proibir também ranking/moeda/cor de metal (ouro/prata/bronze), que a seção 2 da paridade lista como sempre proibidos.
 - **Teste de a11y com corrida de verdade**: o teste "130% a 360px" rodava o axe logo depois de clicar num controle, sem esperar a transição de `color`/`background-color` (`--dur-controle`, 200ms, nova nesta etapa) assentar — o axe media a cor **no meio** da transição e achava contraste baixo num frame que não existe parado (nem o estado antes, nem o depois do clique). Corrigido com uma espera de 300ms antes do axe.
 
+**Desempenho (tela nova) e Assunto no Treino (pedido à parte, imagem de referência)**
+- Novo nível de agrupamento "Assunto" entre Área e Habilidade (ex.: Matemática → Geometria → H47-H49) — não existia
+  nenhuma forma disso no contrato. `Habilidade` ganhou `area`/`assunto` reais (fechando a pendência 6b já registrada
+  acima); lista de assuntos por área é mock, inspirada nos eixos do ENEM mas não oficial — ver `CONTRATO_PARIDADE.md`.
+- `/desempenho` (visão geral, nossa) e `/desempenho/[area]` (detalhe, seguindo a imagem: filtros de área/período,
+  indicadores, assuntos do pior pro melhor, habilidades do assunto selecionado com botões "Ver questões"/"Treinar").
+  Tendência (subindo/caindo/estável/poucos dados) compara a metade mais antiga com a mais recente das respostas do
+  período — client-side, candidato forte a virar cálculo do back-end quando a API de verdade existir.
+- Treino ganhou a seção "Assunto" (só com uma área escolhida): ladrilhos com taxa de acerto, filtra a Combobox de
+  habilidade, aparece no resumo, e o texto do cartão "Por habilidade" agora cita o assunto do reforço indicado.
+  `PedidoRecomendacao` ganhou `habilidades?: string[]` (plural) pra "treinar o assunto inteiro" — filtro universal no
+  motor, funciona em qualquer modo.
+- Banco de questões (mock) cresceu de 60 pra 400 e de 6 pra ~14-18 habilidades por área, só pra ter volume de
+  demonstração suficiente por assunto — não mexe no contrato, só no gerador de dados fictícios.
+- **Testado de verdade no navegador**: troca de período (7/30/90/tudo) recalcula os números; troca de área navega
+  entre `/desempenho/[area]`; selecionar um assunto troca a tabela de habilidades; "Treinar {assunto}, N questões"
+  inicia sessão de verdade e navega pro treino (inclusive o aviso de "questões elegíveis acabaram" quando o assunto
+  tem poucas questões cadastradas — fallback já existente no motor, não um bug novo); funciona em mobile (375px).
+
 **Taxa de acerto por área em "Seus números" (pedido à parte)**
 - Pedido do usuário olhando o Início: queria ver o percentual de acerto de cada matéria/área, não só o geral.
   `ResumoGeral` ganhou o campo `porArea: { area, respondidas, acertos, taxaAcerto }[]` (sempre as 4 áreas, mock

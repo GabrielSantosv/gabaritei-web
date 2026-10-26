@@ -53,7 +53,18 @@ test.describe("@a11y rotas públicas", () => {
   }
 });
 
-const ROTAS_AUTENTICADAS = ["/inicio", "/questoes", "/questoes/demo-003", "/treino", "/simulados", "/historico", "/perfil", "/configuracoes"];
+const ROTAS_AUTENTICADAS = [
+  "/inicio",
+  "/questoes",
+  "/questoes/demo-003",
+  "/treino",
+  "/simulados",
+  "/historico",
+  "/desempenho",
+  "/desempenho/MT",
+  "/perfil",
+  "/configuracoes",
+];
 
 test.describe("@a11y rotas autenticadas", () => {
   test.beforeEach(async ({ page }, testInfo) => {

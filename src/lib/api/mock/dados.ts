@@ -8,7 +8,11 @@ import type { Area, Bloco, Faixa, Habilidade, Questao } from "../types";
 
 export const SEMENTE = 42;
 export const MOCK_MIN_RESPOSTAS = 20; // TODO(equipe): volume mínimo por área (RF09, RF10)
-export const TOTAL_QUESTOES_DEMO = 60;
+export const TOTAL_QUESTOES_DEMO = 400;
+// Desempenho (pedido à parte, fora das etapas P*): abaixo disso uma habilidade
+// ou assunto ainda não mostra tendência ("Poucos dados" em vez de subindo/
+// caindo/estável) — mesma régua do texto da referência visual.
+export const MIN_RESPOSTAS_TENDENCIA = 5;
 
 /** Gerador pseudoaleatório determinístico (mulberry32). */
 export function criarGerador(semente: number) {
@@ -32,51 +36,210 @@ const NOMES_AREA: Record<Area, string> = {
 };
 
 /**
- * Habilidades por área, no formato H<n> da Matriz de Referência.
- * TODO(equipe): conferir códigos e descrições com a Matriz oficial antes de publicar.
+ * Habilidades por área, agrupadas por assunto (competência), no formato H<n>
+ * da Matriz de Referência. Desempenho (pedido à parte): o assunto é o nível
+ * entre área e habilidade que a tela de Desempenho usa pra agrupar — não
+ * existia nenhum agrupamento assim no contrato antes disso.
+ * TODO(equipe): conferir assuntos, códigos e descrições com a Matriz oficial
+ * antes de publicar — nomes e divisão aqui são só pra exercitar a tela.
  */
-const DESCRICOES_HABILIDADE: Record<Area, string[]> = {
+interface AssuntoDef {
+  nome: string;
+  habilidades: string[];
+}
+
+const ASSUNTOS: Record<Area, AssuntoDef[]> = {
   LC: [
-    "Reconhecer diferentes formas de tratar uma informação na comparação de textos.",
-    "Identificar a tese de um texto, considerando sua estrutura argumentativa.",
-    "Reconhecer a função social de diferentes gêneros textuais.",
-    "Analisar a validade de um argumento a partir das relações lógico-discursivas.",
-    "Reconhecer efeitos de sentido decorrentes do uso de recursos linguísticos.",
-    "Relacionar informações sobre concepções artísticas e características da produção cultural.",
+    {
+      nome: "Leitura e interpretação",
+      habilidades: [
+        "Reconhecer diferentes formas de tratar uma informação na comparação de textos.",
+        "Identificar a tese de um texto, considerando sua estrutura argumentativa.",
+        "Inferir o sentido de uma palavra ou expressão a partir do contexto.",
+      ],
+    },
+    {
+      nome: "Gêneros textuais",
+      habilidades: [
+        "Reconhecer a função social de diferentes gêneros textuais.",
+        "Analisar a validade de um argumento a partir das relações lógico-discursivas.",
+        "Reconhecer a finalidade comunicativa de um texto publicitário.",
+      ],
+    },
+    {
+      nome: "Gramática e norma culta",
+      habilidades: [
+        "Reconhecer efeitos de sentido decorrentes do uso de recursos linguísticos.",
+        "Identificar o registro linguístico adequado a diferentes situações de comunicação.",
+        "Reconhecer marcas de variação linguística em textos orais e escritos.",
+      ],
+    },
+    {
+      nome: "Literatura e artes",
+      habilidades: [
+        "Relacionar informações sobre concepções artísticas e características da produção cultural.",
+        "Reconhecer recursos expressivos da linguagem poética.",
+        "Analisar a relação entre texto literário e contexto histórico-social.",
+      ],
+    },
+    {
+      nome: "Linguagens e tecnologias",
+      habilidades: [
+        "Analisar o impacto das tecnologias digitais na comunicação contemporânea.",
+        "Relacionar linguagem verbal e não verbal na construção de sentido.",
+      ],
+    },
   ],
   CH: [
-    "Compreender a produção e o papel histórico das instituições sociais.",
-    "Analisar a influência dos meios de comunicação na construção de valores.",
-    "Comparar diferentes pontos de vista sobre um mesmo processo histórico ou geográfico.",
-    "Identificar registros de conflitos sociais decorrentes de desigualdades.",
-    "Relacionar cidadania e democracia em diferentes conjunturas históricas.",
-    "Analisar a geopolítica e as relações de poder entre nações e blocos econômicos.",
+    {
+      nome: "História do Brasil",
+      habilidades: [
+        "Compreender a produção e o papel histórico das instituições sociais.",
+        "Identificar registros de conflitos sociais decorrentes de desigualdades.",
+        "Analisar processos de formação territorial do Brasil.",
+      ],
+    },
+    {
+      nome: "Geografia",
+      habilidades: [
+        "Comparar diferentes pontos de vista sobre um mesmo processo histórico ou geográfico.",
+        "Analisar a geopolítica e as relações de poder entre nações e blocos econômicos.",
+        "Relacionar características climáticas a processos de uso e ocupação do solo.",
+      ],
+    },
+    {
+      nome: "Cidadania e política",
+      habilidades: [
+        "Relacionar cidadania e democracia em diferentes conjunturas históricas.",
+        "Analisar mecanismos de participação política na sociedade contemporânea.",
+        "Reconhecer direitos e deveres previstos na Constituição.",
+      ],
+    },
+    {
+      nome: "Sociologia e cultura",
+      habilidades: [
+        "Analisar a influência dos meios de comunicação na construção de valores.",
+        "Comparar manifestações culturais de diferentes grupos sociais.",
+      ],
+    },
+    {
+      nome: "Filosofia",
+      habilidades: [
+        "Relacionar diferentes correntes filosóficas a seus contextos históricos.",
+        "Analisar argumentos éticos aplicados a dilemas contemporâneos.",
+      ],
+    },
   ],
   CN: [
-    "Compreender o papel da fotossíntese e da respiração celular no ciclo da matéria.",
-    "Associar a solução de problemas do cotidiano a conhecimentos físicos e químicos.",
-    "Compreender fenômenos decorrentes da interação entre luz e matéria.",
-    "Relacionar informações para compreender a importância da água para a vida.",
-    "Analisar fatores socioambientais associados ao uso de recursos energéticos.",
-    "Compreender as relações entre os seres vivos e o ambiente em que vivem.",
+    {
+      nome: "Biologia",
+      habilidades: [
+        "Compreender o papel da fotossíntese e da respiração celular no ciclo da matéria.",
+        "Compreender as relações entre os seres vivos e o ambiente em que vivem.",
+        "Relacionar características genéticas à hereditariedade.",
+      ],
+    },
+    {
+      nome: "Química",
+      habilidades: [
+        "Associar a solução de problemas do cotidiano a conhecimentos físicos e químicos.",
+        "Reconhecer transformações químicas presentes em processos do cotidiano.",
+        "Analisar o impacto de substâncias químicas sobre o ambiente e a saúde.",
+      ],
+    },
+    {
+      nome: "Física",
+      habilidades: [
+        "Compreender fenômenos decorrentes da interação entre luz e matéria.",
+        "Resolver situação-problema envolvendo conceitos de energia e suas transformações.",
+        "Analisar fenômenos relacionados a eletricidade e magnetismo.",
+      ],
+    },
+    {
+      nome: "Ecologia e sustentabilidade",
+      habilidades: [
+        "Analisar fatores socioambientais associados ao uso de recursos energéticos.",
+        "Relacionar informações para compreender a importância da água para a vida.",
+        "Avaliar impactos ambientais decorrentes de atividades humanas.",
+      ],
+    },
+    {
+      nome: "Saúde e corpo humano",
+      habilidades: [
+        "Relacionar hábitos de vida a fatores de risco e proteção à saúde.",
+        "Compreender o funcionamento integrado dos sistemas do corpo humano.",
+      ],
+    },
   ],
   MT: [
-    "Resolver situação-problema envolvendo conhecimentos numéricos.",
-    "Avaliar propostas de intervenção usando conhecimentos geométricos.",
-    "Resolver situação-problema que envolva funções exponenciais ou logarítmicas.",
-    "Interpretar informações apresentadas em tabelas e gráficos.",
-    "Avaliar a probabilidade de ocorrência de um evento associado a um experimento aleatório.",
-    "Utilizar conhecimentos de estatística para analisar dados de pesquisas.",
+    {
+      nome: "Números e operações",
+      habilidades: [
+        "Resolver situação-problema envolvendo conhecimentos numéricos.",
+        "Avaliar propostas que envolvam porcentagem e proporcionalidade.",
+        "Interpretar fenômenos utilizando notação científica.",
+      ],
+    },
+    {
+      nome: "Álgebra",
+      habilidades: [
+        "Resolver situação-problema envolvendo equações e inequações.",
+        "Resolver situação-problema que envolva funções exponenciais ou logarítmicas.",
+      ],
+    },
+    {
+      nome: "Geometria",
+      habilidades: [
+        "Avaliar propostas de intervenção usando conhecimentos geométricos.",
+        "Resolver situação-problema envolvendo áreas e volumes.",
+        "Identificar características de figuras planas e espaciais.",
+      ],
+    },
+    {
+      nome: "Grandezas e medidas",
+      habilidades: [
+        "Resolver situação-problema envolvendo unidades de medida e conversões.",
+        "Avaliar o uso de escalas em mapas e plantas.",
+      ],
+    },
+    {
+      nome: "Variação de grandezas",
+      habilidades: [
+        "Interpretar gráficos que representem a relação entre duas grandezas.",
+        "Resolver situação-problema envolvendo grandezas direta ou inversamente proporcionais.",
+      ],
+    },
+    {
+      nome: "Estatística e probabilidade",
+      habilidades: [
+        "Utilizar conhecimentos de estatística para analisar dados de pesquisas.",
+        "Avaliar a probabilidade de ocorrência de um evento associado a um experimento aleatório.",
+        "Calcular medidas de tendência central de um conjunto de dados.",
+      ],
+    },
+    {
+      nome: "Gráficos e tabelas",
+      habilidades: [
+        "Interpretar informações apresentadas em tabelas e gráficos.",
+        "Relacionar dados apresentados em diferentes tipos de gráfico.",
+      ],
+    },
   ],
 };
+
+export function assuntosDaArea(area: Area): AssuntoDef[] {
+  return ASSUNTOS[area];
+}
 
 export function gerarHabilidades(): Habilidade[] {
   const habilidades: Habilidade[] = [];
   let contador = 1;
   for (const area of AREAS) {
-    for (const descricao of DESCRICOES_HABILIDADE[area]) {
-      habilidades.push({ codigo: `H${contador}`, descricao: `${descricao} (${area})` });
-      contador += 1;
+    for (const assunto of ASSUNTOS[area]) {
+      for (const descricao of assunto.habilidades) {
+        habilidades.push({ codigo: `H${contador}`, descricao, area, assunto: assunto.nome });
+        contador += 1;
+      }
     }
   }
   return habilidades;
@@ -85,8 +248,7 @@ export function gerarHabilidades(): Habilidade[] {
 export const HABILIDADES = gerarHabilidades();
 
 export function habilidadesDaArea(area: Area): Habilidade[] {
-  const inicio = AREAS.indexOf(area) * DESCRICOES_HABILIDADE[area].length;
-  return HABILIDADES.slice(inicio, inicio + DESCRICOES_HABILIDADE[area].length);
+  return HABILIDADES.filter((h) => h.area === area);
 }
 
 /** Cortes de dificuldade a partir do parâmetro b. TODO(equipe): cortes por área (RF03). */

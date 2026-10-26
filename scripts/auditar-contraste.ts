@@ -16,7 +16,18 @@ const BASE_URL = process.env.AUDIT_BASE_URL ?? "http://localhost:3000";
 
 // Cresce a cada etapa que adiciona telas novas (seção 12).
 const ROTAS = ["/entrar", "/cadastrar", "/termos", "/privacidade", "/dev/componentes"];
-const ROTAS_AUTENTICADAS = ["/inicio", "/questoes", "/questoes/demo-003", "/treino", "/simulados", "/historico", "/perfil", "/configuracoes"];
+const ROTAS_AUTENTICADAS = [
+  "/inicio",
+  "/questoes",
+  "/questoes/demo-003",
+  "/treino",
+  "/simulados",
+  "/historico",
+  "/desempenho",
+  "/desempenho/MT",
+  "/perfil",
+  "/configuracoes",
+];
 const TEMAS = ["claro", "escuro"] as const;
 
 // Matriz de paletas (seção 7): Floresta roda em ROTAS_AUTENTICADAS acima, nos

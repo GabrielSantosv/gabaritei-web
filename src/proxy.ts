@@ -15,6 +15,7 @@ const ROTAS_PROTEGIDAS = [
   "/questoes",
   "/simulados",
   "/historico",
+  "/desempenho",
   "/perfil",
   "/configuracoes",
 ];
@@ -43,6 +44,7 @@ export const config = {
     "/questoes/:path*",
     "/simulados/:path*",
     "/historico/:path*",
+    "/desempenho/:path*",
     "/perfil/:path*",
     "/configuracoes/:path*",
   ],
