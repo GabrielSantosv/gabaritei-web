@@ -21,7 +21,13 @@ export function ProgressBar({ valor, total, rotulo, mostrarNumero = true, classN
         aria-valuemax={total}
         className="h-2 flex-1 overflow-hidden rounded-full bg-paper-2"
       >
-        <div className="h-full rounded-full bg-brand motion-safe-transition" style={{ width: `${percentual}%` }} />
+        <div
+          // border na mesma cor do preenchimento: invisível no uso normal, mas
+          // forced-colors (Windows, alto contraste) preserva bordas com cores de
+          // sistema mesmo quando ignora background-color — mantém a barra visível.
+          className="h-full rounded-full border border-brand bg-brand motion-safe-transition"
+          style={{ width: `${percentual}%` }}
+        />
       </div>
       {mostrarNumero ? (
         <span className="shrink-0 text-sm tabular-nums text-ink-2">

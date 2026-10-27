@@ -78,11 +78,12 @@ test.describe("Criar conta", () => {
     await page.getByRole("button", { name: "Pular por enquanto" }).click();
     await page.waitForURL("**/inicio");
 
-    // A saudação muda com o horário (Bom dia/Boa tarde/Boa noite) — testa o
-    // conjunto das 3, não uma só, pra não depender da hora em que o teste roda.
-    const h1 = page.getByRole("heading", { level: 1 });
-    await expect(h1).toContainText("Marina");
-    await expect(h1).toHaveText(/^(Bom dia|Boa tarde|Boa noite), Marina\.$/);
+    // Início novo: o h1 é um texto fixo ("Estude para o ENEM..."), a saudação
+    // virou um parágrafo ao lado do selo do Foguinho, na faixa. A saudação muda
+    // com o horário (Bom dia/Boa tarde/Boa noite) — testa o conjunto das 3, não
+    // uma só, pra não depender da hora em que o teste roda.
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Estude para o ENEM com a ajuda do Gabaritei.");
+    await expect(page.getByText(/^(Bom dia|Boa tarde|Boa noite), Marina\.$/)).toBeVisible();
 
     // Contraste do banner de demonstração ≥ 4,5:1 (seção 11) — mesma fórmula WCOAG
     // (luminância relativa) do scripts/auditar-contraste.ts, calculada no navegador.
