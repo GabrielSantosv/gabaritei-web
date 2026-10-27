@@ -197,10 +197,21 @@ export function gerarRecomendacoes(
       );
     }
   } else if (modoEfetivo === "habilidade") {
-    const prioridades = habilidadesPrioritarias(contexto.tentativas, pedido.areas);
-    const alvo = pedido.habilidade ?? prioridades[0]?.habilidade;
-    habilidadeAlvo = alvo ? BANCO_DEMO.find((q) => q.questao.habilidade?.codigo === alvo)?.questao.habilidade ?? null : null;
-    if (alvo) candidatos = candidatos.filter((q) => q.questao.habilidade?.codigo === alvo);
+    // Bug real corrigido: com assunto (pedido.habilidades, plural) e sem uma
+    // habilidade específica escolhida, este branch caía no fallback de baixo
+    // (prioridades[0], a prioridade GLOBAL de reforço) e refiltrava candidatos
+    // só por ela — ignorando o assunto já aplicado acima e, pior, mostrando no
+    // critério uma habilidade de outro assunto. Sem habilidade única, deixa
+    // candidatos como o filtro de assunto já deixou; o critério de cada
+    // questão usa a própria habilidade dela (varia dentro do assunto).
+    if (!pedido.habilidade && pedido.habilidades && pedido.habilidades.length > 0) {
+      habilidadeAlvo = null;
+    } else {
+      const prioridades = habilidadesPrioritarias(contexto.tentativas, pedido.areas);
+      const alvo = pedido.habilidade ?? prioridades[0]?.habilidade;
+      habilidadeAlvo = alvo ? BANCO_DEMO.find((q) => q.questao.habilidade?.codigo === alvo)?.questao.habilidade ?? null : null;
+      if (alvo) candidatos = candidatos.filter((q) => q.questao.habilidade?.codigo === alvo);
+    }
   } else if (modoEfetivo === "nivel") {
     const area = areaAlvo ?? "MT";
     const prof = proficienciaSimples(contexto.tentativas, area);

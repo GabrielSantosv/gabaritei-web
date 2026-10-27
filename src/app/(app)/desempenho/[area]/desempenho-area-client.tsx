@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, MoreHorizontal, TrendingDown, TrendingUp } from "lucide-react";
+import { ChevronDown, ChevronRight, MoreHorizontal, TrendingDown, TrendingUp } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 
@@ -49,6 +49,12 @@ function RotuloTendencia({ tendencia }: { tendencia: Tendencia | null }) {
       {texto}
     </span>
   );
+}
+
+function faixaDeCodigos(assunto: DesempenhoAssunto): string {
+  if (assunto.habilidades.length === 0) return "";
+  if (assunto.habilidades.length === 1) return assunto.habilidades[0].habilidade.codigo;
+  return `${assunto.habilidades[0].habilidade.codigo} a ${assunto.habilidades[assunto.habilidades.length - 1].habilidade.codigo}`;
 }
 
 function BarraTaxa({ taxaAcerto }: { taxaAcerto: number | null }) {
@@ -107,20 +113,10 @@ function PainelArea({ area }: { area: Area }) {
 
   const assunto = data?.assuntos.find((a) => a.nome === assuntoSelecionado) ?? null;
   const codigosDoAssunto = assunto ? assunto.habilidades.map((h) => h.habilidade.codigo) : [];
-  const faixaHabilidades =
-    assunto && assunto.habilidades.length > 0
-      ? assunto.habilidades.length === 1
-        ? assunto.habilidades[0].habilidade.codigo
-        : `${assunto.habilidades[0].habilidade.codigo} a ${assunto.habilidades[assunto.habilidades.length - 1].habilidade.codigo}`
-      : "";
+  const faixaHabilidades = assunto ? faixaDeCodigos(assunto) : "";
 
   return (
     <div>
-      <Link href="/desempenho" className="mb-2 inline-flex items-center gap-1 text-sm">
-        <ChevronLeft className="size-4" strokeWidth={1.75} aria-hidden="true" />
-        Voltar para Desempenho
-      </Link>
-
       <PageHeader
         titulo={`Desempenho em ${NOME_AREA[area]}`}
         descricao="Veja em quais assuntos você mais erra e treine direto neles."
@@ -204,20 +200,39 @@ function PainelArea({ area }: { area: Area }) {
           </div>
           <ul>
             {data.assuntos.map((a) => (
-              <li key={a.nome} className="border-t border-rule">
+              <li
+                key={a.nome}
+                className={cn(
+                  "flex flex-wrap items-center gap-3 border-t border-rule px-5 py-4 motion-safe-transition",
+                  assuntoSelecionado === a.nome && "bg-brand-soft",
+                )}
+              >
+                {/* O botão cobre nome/código/números (seleciona o assunto); "Treinar"
+                    é um link irmão, fora do botão — dois controles não podem ficar
+                    aninhados ("nested-interactive" no axe). */}
                 <button
                   type="button"
                   aria-current={assuntoSelecionado === a.nome ? "true" : undefined}
                   onClick={() => setAssuntoSelecionado(a.nome)}
-                  className={cn(
-                    "flex w-full flex-wrap items-center justify-between gap-3 px-5 py-4 text-left motion-safe-transition hover:bg-paper-2",
-                    assuntoSelecionado === a.nome && "bg-brand-soft",
-                  )}
+                  className="flex min-w-0 flex-1 flex-wrap items-center gap-3 text-left hover:text-ink"
                 >
-                  <span className="flex min-w-0 flex-1 items-center gap-2">
-                    <span className="font-medium text-ink">{a.nome}</span>
-                    {a.maisFraco ? (
-                      <span className="rounded-full bg-paper px-2 py-0.5 text-xs font-medium text-ink-2">Mais fraco</span>
+                  <ChevronDown
+                    className={cn(
+                      "size-4 shrink-0 text-ink-2 motion-safe-transition",
+                      assuntoSelecionado === a.nome ? "rotate-0" : "-rotate-90",
+                    )}
+                    strokeWidth={1.75}
+                    aria-hidden="true"
+                  />
+                  <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <span className="flex flex-wrap items-center gap-2">
+                      <span className="font-medium text-ink">{a.nome}</span>
+                      {a.maisFraco ? (
+                        <span className="rounded-full bg-paper px-2 py-0.5 text-xs font-medium text-ink-2">Mais fraco</span>
+                      ) : null}
+                    </span>
+                    {a.habilidades.length > 0 ? (
+                      <span className="font-mono text-xs text-ink-2">{faixaDeCodigos(a)}</span>
                     ) : null}
                   </span>
                   <span className="w-20 shrink-0 text-right text-sm text-ink-2">{a.respondidas}</span>
@@ -228,6 +243,9 @@ function PainelArea({ area }: { area: Area }) {
                     <RotuloTendencia tendencia={a.tendencia} />
                   </span>
                 </button>
+                <Link href={`/treino?modo=habilidade&area=${area}&assunto=${encodeURIComponent(a.nome)}`} className="shrink-0 text-sm font-medium">
+                  Treinar
+                </Link>
               </li>
             ))}
           </ul>

@@ -85,11 +85,16 @@ export function paraFiltrosApi(estado: EstadoFiltros): FiltrosQuestoes {
   };
 }
 
-/** O intervalo de anos (De/Até) conta como um filtro só, não um por ano. */
+/**
+ * O intervalo de anos (De/Até) conta como um filtro só, não um por ano — e o
+ * mesmo vale pra habilidades: a Combobox de Questões agora escolhe um assunto
+ * inteiro de uma vez (ver PainelFiltros em questoes-client.tsx), nunca um
+ * código isolado, então os códigos resultantes contam como 1 filtro.
+ */
 export function contarFiltrosAtivos(estado: EstadoFiltros): number {
   return (
     estado.areas.length +
-    estado.habilidades.length +
+    (estado.habilidades.length > 0 ? 1 : 0) +
     (estado.anos.length > 0 ? 1 : 0) +
     estado.faixas.length
   );

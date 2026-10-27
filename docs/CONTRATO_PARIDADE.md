@@ -55,9 +55,16 @@ real ainda não prometeu. Atualizada ao fim de cada etapa P*.
   `motivo` do cartão "Por habilidade" agora cita assunto + habilidade do reforço atual.
 - **Banco de questões crescido** de 60 pra 400 (`TOTAL_QUESTOES_DEMO`) e habilidades de 6 pra ~14-18 por área, pra
   cada assunto ter volume suficiente pra demonstração — mexe só em dado de mock, não no contrato.
-- **Rota nova `/desempenho`** (visão geral por área, nossa) e **`/desempenho/[area]`** (o detalhe, seguindo a imagem
-  de referência: filtros de área/período, indicadores, lista de assuntos ordenada do pior pro melhor, habilidades do
-  assunto selecionado). "Desempenho" entrou no menu principal e nas rotas protegidas.
+- **Rota `/desempenho/[area]`** é o detalhe de verdade (seguindo a imagem de referência: filtros de área/período,
+  indicadores, lista de assuntos ordenada do pior pro melhor, habilidades do assunto selecionado). **`/desempenho`
+  não é mais uma tela própria** — só redireciona pra `/desempenho/LC` (`page.tsx`); a visão geral com 4 cartões por
+  área (nossa, não vinha da imagem de referência) foi removida a pedido do usuário, que achou redundante ter uma
+  tela "escolha a área" antes de ver o detalhe, já que o detalhe tem seu próprio seletor de área/período que
+  atualiza a mesma tela. "Desempenho" continua no menu principal e nas rotas protegidas.
+- **Filtro de Questões por Assunto**: a tela de Questões trocou a Combobox de Habilidade (código + descrição) por
+  uma Combobox de Assunto — não é campo novo no contrato, `FiltrosQuestoes.habilidades` continua sendo lista de
+  códigos (seção 7.1); a UI só resolve um assunto escolhido pra todos os códigos daquele assunto antes de montar o
+  filtro.
 
 ## Histórico, resumo do simulado e Questões (pedido à parte, canvas de identidade)
 

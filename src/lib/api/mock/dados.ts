@@ -92,39 +92,39 @@ const ASSUNTOS: Record<Area, AssuntoDef[]> = {
   ],
   CH: [
     {
-      nome: "História do Brasil",
+      nome: "Brasil Colônia e Independência",
       habilidades: [
+        "Analisar processos de formação territorial do Brasil.",
         "Compreender a produção e o papel histórico das instituições sociais.",
         "Identificar registros de conflitos sociais decorrentes de desigualdades.",
-        "Analisar processos de formação territorial do Brasil.",
       ],
     },
     {
-      nome: "Geografia",
-      habilidades: [
-        "Comparar diferentes pontos de vista sobre um mesmo processo histórico ou geográfico.",
-        "Analisar a geopolítica e as relações de poder entre nações e blocos econômicos.",
-        "Relacionar características climáticas a processos de uso e ocupação do solo.",
-      ],
-    },
-    {
-      nome: "Cidadania e política",
+      nome: "Primeiro e Segundo Reinado",
       habilidades: [
         "Relacionar cidadania e democracia em diferentes conjunturas históricas.",
-        "Analisar mecanismos de participação política na sociedade contemporânea.",
         "Reconhecer direitos e deveres previstos na Constituição.",
       ],
     },
     {
-      nome: "Sociologia e cultura",
+      nome: "República e Era Vargas",
       habilidades: [
-        "Analisar a influência dos meios de comunicação na construção de valores.",
+        "Analisar mecanismos de participação política na sociedade contemporânea.",
+        "Comparar diferentes pontos de vista sobre um mesmo processo histórico ou geográfico.",
+      ],
+    },
+    {
+      nome: "Guerra Mundial e Guerra Fria",
+      habilidades: [
+        "Analisar a geopolítica e as relações de poder entre nações e blocos econômicos.",
         "Comparar manifestações culturais de diferentes grupos sociais.",
       ],
     },
     {
-      nome: "Filosofia",
+      nome: "Geografia, cidadania e cultura",
       habilidades: [
+        "Relacionar características climáticas a processos de uso e ocupação do solo.",
+        "Analisar a influência dos meios de comunicação na construção de valores.",
         "Relacionar diferentes correntes filosóficas a seus contextos históricos.",
         "Analisar argumentos éticos aplicados a dilemas contemporâneos.",
       ],

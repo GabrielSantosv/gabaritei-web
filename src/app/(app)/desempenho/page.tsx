@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import { DesempenhoClient } from "./desempenho-client";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = { title: "Desempenho" };
-
+// Não existe mais uma tela "escolha uma área" antes do detalhe — "/desempenho"
+// sempre foi um atalho, então ele cai direto numa área (LC), e o filtro de área
+// dentro do próprio painel ([area]/desempenho-area-client.tsx) é que troca a tela.
 export default function DesempenhoPage() {
-  return <DesempenhoClient />;
+  redirect("/desempenho/LC");
 }

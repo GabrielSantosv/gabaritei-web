@@ -61,6 +61,31 @@ function toggle<T>(lista: T[], valor: T): T[] {
   return lista.includes(valor) ? lista.filter((v) => v !== valor) : [...lista, valor];
 }
 
+/**
+ * Agrupa as habilidades por assunto (ex.: Matemática → Geometria → H47-H49).
+ * O filtro de Questões escolhe um assunto inteiro de uma vez — mais fácil de
+ * reconhecer do que a lista de ~59 códigos de habilidade que ele substituiu.
+ */
+function agruparPorAssunto(habilidades: Habilidade[]): Map<string, { area: Area; codigos: string[] }> {
+  const porAssunto = new Map<string, { area: Area; codigos: string[] }>();
+  for (const h of habilidades) {
+    const atual = porAssunto.get(h.assunto) ?? { area: h.area, codigos: [] };
+    atual.codigos.push(h.codigo);
+    porAssunto.set(h.assunto, atual);
+  }
+  return porAssunto;
+}
+
+/** Acha o nome do assunto cujo conjunto de códigos é exatamente `codigosFiltro`. */
+function assuntoDoFiltro(porAssunto: Map<string, { area: Area; codigos: string[] }>, codigosFiltro: string[]): string | null {
+  if (codigosFiltro.length === 0) return null;
+  const conjunto = new Set(codigosFiltro);
+  for (const [nome, v] of porAssunto) {
+    if (v.codigos.length === conjunto.size && v.codigos.every((c) => conjunto.has(c))) return nome;
+  }
+  return null;
+}
+
 function PainelFiltros({
   estado,
   habilidades,
@@ -70,15 +95,12 @@ function PainelFiltros({
   habilidades: Habilidade[];
   onMudar: (novo: Partial<EstadoFiltros>) => void;
 }) {
-  const opcoesHabilidade = useMemo(
-    () =>
-      habilidades.map((h) => ({
-        valor: h.codigo,
-        rotulo: `${h.codigo}: ${h.descricao ?? "sem descrição"}`,
-        grupo: ROTULO_AREA[h.area],
-      })),
-    [habilidades],
+  const porAssunto = useMemo(() => agruparPorAssunto(habilidades), [habilidades]);
+  const opcoesAssunto = useMemo(
+    () => [...porAssunto.entries()].map(([nome, v]) => ({ valor: nome, rotulo: nome, grupo: ROTULO_AREA[v.area] })),
+    [porAssunto],
   );
+  const assuntoSelecionado = assuntoDoFiltro(porAssunto, estado.habilidades);
 
   // De/Até (canvas Telas.dc.html): mostra o intervalo que já está selecionado;
   // se o estado de anos veio de uma URL montada à mão com lacunas, mostra só
@@ -104,11 +126,11 @@ function PainelFiltros({
 
       <div>
         <Combobox
-          rotulo="Habilidade"
-          placeholder="Todas"
-          valor={estado.habilidades[0] ?? null}
-          onValorChange={(v) => onMudar({ habilidades: v ? [v] : [], pagina: 1 })}
-          opcoes={opcoesHabilidade}
+          rotulo="Assunto"
+          placeholder="Todos"
+          valor={assuntoSelecionado}
+          onValorChange={(nome) => onMudar({ habilidades: nome ? porAssunto.get(nome)?.codigos ?? [] : [], pagina: 1 })}
+          opcoes={opcoesAssunto}
         />
         {estado.habilidades.length > 0 ? (
           <p className="mt-1.5 text-xs text-ink-2">Questões sem esse dado cadastrado não aparecem neste filtro.</p>
@@ -225,13 +247,20 @@ function ListaQuestoes() {
   const itensOrdenados = useMemo(() => (pagina ? ordenarQuestoes(pagina.itens, estado.ordenar) : []), [pagina, estado.ordenar]);
   const totalPaginas = pagina ? Math.max(1, Math.ceil(pagina.total / PAGINA_TAMANHO)) : 1;
   const filtrosAtivos = contarFiltrosAtivos(estado);
+  const porAssunto = useMemo(() => agruparPorAssunto(habilidades ?? []), [habilidades]);
 
   const chips: { rotulo: string; aoRemover: () => void }[] = [
     ...estado.areas.map((a) => ({ rotulo: ROTULO_AREA[a], aoRemover: () => onMudar({ areas: toggle(estado.areas, a), pagina: 1 }) })),
-    ...estado.habilidades.map((h) => ({
-      rotulo: habilidades?.find((x) => x.codigo === h)?.codigo ?? h,
-      aoRemover: () => onMudar({ habilidades: toggle(estado.habilidades, h), pagina: 1 }),
-    })),
+    // A Combobox escolhe um assunto inteiro de uma vez, então o chip representa
+    // o assunto todo (não um código isolado) — ver agruparPorAssunto/assuntoDoFiltro.
+    ...(estado.habilidades.length > 0
+      ? [
+          {
+            rotulo: assuntoDoFiltro(porAssunto, estado.habilidades) ?? estado.habilidades.join(", "),
+            aoRemover: () => onMudar({ habilidades: [], pagina: 1 }),
+          },
+        ]
+      : []),
     // De/Até (canvas Telas.dc.html): um chip só pro intervalo todo, não um por ano.
     ...(estado.anos.length > 0
       ? [

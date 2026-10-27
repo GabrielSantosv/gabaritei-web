@@ -64,6 +64,37 @@ Lista viva de decisões do grupo (`TODO(equipe)`) e tipos novos. A IA não decid
   `TOTAL_QUESTOES_DEMO` novo. `npm run audit:contraste` (zero falhas, 5 paletas × 2 temas, incluindo `/desempenho` e
   `/desempenho/MT`), `test:a11y` (116) e `test:e2e` (218) rodados de verdade depois do conserto — tudo passando.
 
+**Desempenho e Questões: ajustes pedidos depois de ver a tela de verdade**
+- **Bug real achado testando o link "Treinar" por assunto**: no modo "habilidade" do motor (`engine.ts`,
+  `gerarRecomendacoes`), quando o pedido vinha só com `habilidades` (plural, "treinar o assunto inteiro") e sem
+  `habilidade` (singular), o código ainda calculava `alvo = pedido.habilidade ?? prioridades[0]?.habilidade` — ou
+  seja, caía pra prioridade de reforço **global**, ignorando o assunto já filtrado. Sintoma visto no navegador:
+  pedir `/treino?modo=habilidade&area=MT&assunto=Geometria` mostrava "Recomendado pelo modelo: mesma habilidade
+  (H57)" — H57 nem pertence a Geometria. Corrigido: com `habilidades` plural e sem `habilidade` singular,
+  `habilidadeAlvo` fica `null` e cada questão usa a própria habilidade (já dentro do assunto) no critério — re-
+  testado de verdade, a mesma URL agora mostra a habilidade certa (dentro de Geometria) com a taxa de acerto certa.
+- **Tela "Desempenho" (visão geral, 4 cartões) removida** a pedido do usuário: ele achou que uma tela "escolha a
+  área antes de ver" era redundante com o seletor de área que já existe dentro do detalhe. `/desempenho` agora só
+  redireciona pra `/desempenho/LC` (`page.tsx`); `desempenho-client.tsx` (o cartão por área) foi apagado. O link
+  "Voltar para Desempenho" dentro do detalhe também saiu (não tem mais pra onde "voltar" — o próprio seletor de
+  área/período já é o filtro que sempre atualiza a mesma tela).
+- **Filtro de Habilidade em Questões trocado por Assunto**: a Combobox que listava as ~59 habilidades (código +
+  descrição inteira) virou uma Combobox de Assunto (ex.: Geometria, Álgebra, Primeiro e Segundo Reinado), reusando
+  `Habilidade.assunto` e a mesma mecânica de agrupar por área que já existia. Por baixo do contrato nada mudou:
+  escolher um assunto só preenche `EstadoFiltros.habilidades` com todos os códigos daquele assunto (o campo
+  continua sendo uma lista de códigos, seção 7.1) — `lib/questoes-filtros.ts` ganhou só a contagem de filtro (um
+  assunto = 1 filtro ativo, não N) e `questoes-client.tsx` ganhou `agruparPorAssunto`/`assuntoDoFiltro` pra
+  resolver o nome do assunto de volta a partir dos códigos (pro chip e pro valor selecionado da Combobox).
+- **Assuntos de Ciências Humanas renomeados** pra período histórico (Brasil Colônia e Independência; Primeiro e
+  Segundo Reinado; República e Era Vargas; Guerra Mundial e Guerra Fria; Geografia, cidadania e cultura) em vez das
+  5 disciplinas genéricas de antes — pedido explícito do usuário, que deu esses nomes como exemplo. As descrições
+  de habilidade por trás de cada assunto continuam as mesmas 13 frases genéricas já existentes (só reagrupadas),
+  nenhuma frase nova foi inventada — mesmo aviso de sempre: é dado de exemplo, não a Matriz oficial.
+- Re-testado no navegador depois dos quatro ajustes: `/desempenho` cai direto em Linguagens sem tela intermediária;
+  selecionar "Geometria" em Questões filtra pra H47/H48/H49, mostra 1 chip "Geometria" e "1 ativos". Typecheck,
+  lint e `check:regras` limpos; suíte completa (`test`, `audit:contraste`, `test:a11y`, `test:e2e`) re-rodada depois
+  — ver resultado anotado no commit.
+
 **Taxa de acerto por área em "Seus números" (pedido à parte)**
 - Pedido do usuário olhando o Início: queria ver o percentual de acerto de cada matéria/área, não só o geral.
   `ResumoGeral` ganhou o campo `porArea: { area, respondidas, acertos, taxaAcerto }[]` (sempre as 4 áreas, mock
