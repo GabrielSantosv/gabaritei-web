@@ -31,7 +31,9 @@ test.describe("Início novo", () => {
     ];
     for (const [nome, rota] of abas) {
       await page.goto("/inicio");
-      await page.getByRole("link", { name: new RegExp(`^${nome}:`) }).click();
+      // Espaço depois do nome: distingue da aba homônima da barra lateral, cujo
+      // nome acessível é só "Treino" (sem a descrição que segue, aqui).
+      await page.getByRole("link", { name: new RegExp(`^${nome} `) }).click();
       await page.waitForURL(`**${rota}**`);
     }
   });
