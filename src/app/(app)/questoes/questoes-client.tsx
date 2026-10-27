@@ -95,12 +95,38 @@ function PainelFiltros({
   habilidades: Habilidade[];
   onMudar: (novo: Partial<EstadoFiltros>) => void;
 }) {
-  const porAssunto = useMemo(() => agruparPorAssunto(habilidades), [habilidades]);
+  // Com alguma Área marcada, a Combobox de Assunto só mostra assuntos dessa(s)
+  // área(s) — escolher "Matemática" e abrir o Assunto não deve misturar
+  // Geometria com Leitura e interpretação (pedido do usuário). Sem área
+  // marcada, mostra todas, agrupadas por área como antes.
+  const habilidadesPorArea = useMemo(
+    () => (estado.areas.length ? habilidades.filter((h) => estado.areas.includes(h.area)) : habilidades),
+    [habilidades, estado.areas],
+  );
+  const porAssunto = useMemo(() => agruparPorAssunto(habilidadesPorArea), [habilidadesPorArea]);
   const opcoesAssunto = useMemo(
     () => [...porAssunto.entries()].map(([nome, v]) => ({ valor: nome, rotulo: nome, grupo: ROTULO_AREA[v.area] })),
     [porAssunto],
   );
   const assuntoSelecionado = assuntoDoFiltro(porAssunto, estado.habilidades);
+
+  // Se trocar a Área deixar de fora a área do assunto já escolhido, o assunto
+  // (e os códigos de habilidade que ele implica) sai do filtro junto — senão
+  // ficaria um filtro de assunto "fantasma" de uma área que não está mais
+  // marcada, sem aparecer em lugar nenhum da UI.
+  const porAssuntoTotal = useMemo(() => agruparPorAssunto(habilidades), [habilidades]);
+  const areaDoAssuntoSelecionado = assuntoSelecionado ? porAssuntoTotal.get(assuntoSelecionado)?.area : undefined;
+
+  function onMudarArea(area: Area) {
+    const novasAreas = toggle(estado.areas, area);
+    const assuntoAindaValido =
+      !areaDoAssuntoSelecionado || novasAreas.length === 0 || novasAreas.includes(areaDoAssuntoSelecionado);
+    onMudar({
+      areas: novasAreas,
+      habilidades: assuntoAindaValido ? estado.habilidades : [],
+      pagina: 1,
+    });
+  }
 
   // De/Até (canvas Telas.dc.html): mostra o intervalo que já está selecionado;
   // se o estado de anos veio de uma URL montada à mão com lacunas, mostra só
@@ -118,7 +144,7 @@ function PainelFiltros({
               key={area}
               rotulo={<AreaTag area={area} />}
               checked={estado.areas.includes(area)}
-              onCheckedChange={() => onMudar({ areas: toggle(estado.areas, area), pagina: 1 })}
+              onCheckedChange={() => onMudarArea(area)}
             />
           ))}
         </div>
