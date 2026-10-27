@@ -141,6 +141,36 @@
   }
 }
 
+/* docs/FRONTEND_IDENTIDADE.md, seção 5.1: cinco apelidos da faixa (Início,
+   Simulados), nenhuma cor nova — só apontam pra tokens que já existem, então
+   acompanham a paleta ativa sozinhos. src/styles/paletas.json continua com
+   diff zero: nada aqui é definido por paleta, só por tema (claro/escuro). */
+:root {
+  --band: var(--brand-hover);
+  --on-band: var(--on-brand);
+  --on-band-2: var(--on-brand);
+  --band-btn: var(--paper);
+  --on-band-btn: var(--ink);
+}
+
+[data-theme="dark"] {
+  --band: var(--brand-soft);
+  --on-band: var(--ink);
+  --on-band-2: var(--ink-2);
+  --band-btn: var(--brand);
+  --on-band-btn: var(--on-brand);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --band: var(--brand-soft);
+    --on-band: var(--ink);
+    --on-band-2: var(--ink-2);
+    --band-btn: var(--brand);
+    --on-band-btn: var(--on-brand);
+  }
+}
+
 /* Movimento (docs/FRONTEND_PARIDADE.md, seção 4.4). --ease-spring é gerado por
    scripts/gerar-mola.ts (oscilador harmônico amortecido) — não escreva à mão. */
 :root {

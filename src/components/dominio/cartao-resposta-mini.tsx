@@ -32,10 +32,60 @@ export type CartaoRespostaMiniProps =
       onSelecionar: (n: number) => void;
       className?: string;
     }
-  | { variante: "resumo"; itens: ItemResumo[]; className?: string };
+  | { variante: "resumo"; itens: ItemResumo[]; className?: string }
+  // Início novo: a folha de cartão-resposta ao lado da faixa é só ilustração —
+  // nenhum dado do usuário, por isso não recebe `itens`. Marcações e a linha
+  // "atual" são fixas (exemplo), igual à referência.
+  | { variante: "decorativa"; className?: string };
 
-/** Indicador de progresso compacto (seção 9). Treino: fileira simples. Simulado: grade clicável. Resumo: grade com link de revisão. */
+const LETRAS_DECORATIVA = ["A", "B", "C", "D", "E"] as const;
+const MARCADAS_DECORATIVA: Record<number, string> = { 1: "C", 2: "A", 3: "E" };
+
+function LinhaDecorativa({ n }: { n: number }) {
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-1 rounded-xs px-1.5 py-0.5",
+        n === 4 && "bg-brand-soft ring-1 ring-inset ring-brand",
+      )}
+    >
+      <span className="w-5 shrink-0 font-mono text-xs text-ink-2">{String(n).padStart(2, "0")}</span>
+      {LETRAS_DECORATIVA.map((l) => (
+        <span
+          key={l}
+          className={cn(
+            "flex size-[1.375rem] shrink-0 items-center justify-center rounded-full border font-mono text-[0.6875rem]",
+            MARCADAS_DECORATIVA[n] === l ? "border-ink bg-ink text-paper" : "border-rule-strong text-ink-2",
+          )}
+        >
+          {l}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/** Indicador de progresso compacto (seção 9). Treino: fileira simples. Simulado: grade clicável. Resumo: grade com link de revisão. Decorativa: ilustração fixa (Início). */
 export function CartaoRespostaMini(props: CartaoRespostaMiniProps) {
+  if (props.variante === "decorativa") {
+    return (
+      <div aria-hidden="true" className={cn("flex flex-col gap-2.5 rounded-md bg-paper p-4 text-ink", props.className)}>
+        <div className="flex justify-center gap-3.5">
+          <div className="flex flex-col gap-0.5">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <LinhaDecorativa key={n} n={n} />
+            ))}
+          </div>
+          <div className="flex flex-col gap-0.5">
+            {[6, 7, 8, 9, 10].map((n) => (
+              <LinhaDecorativa key={n} n={n} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (props.variante === "treino") {
     const { itens, atual, className } = props;
     return (

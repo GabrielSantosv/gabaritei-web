@@ -15,6 +15,7 @@ const CLASSES_VARIANTE: Record<ButtonVariante, string> = {
   discreto: "bg-transparent text-ink-2 hover:bg-paper-2 hover:text-ink",
   perigoso: "bg-err text-on-err hover:opacity-90",
   inverso: "bg-paper text-brand-ink hover:bg-paper-2",
+  vazado: "border border-brand bg-transparent text-brand-ink hover:bg-brand-soft",
 };
 
 /** Botão só de ícone. `aria-label` é obrigatório (seção 9: nunca sem nome acessível). */

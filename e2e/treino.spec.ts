@@ -17,7 +17,7 @@ async function responderUmaAlternativa(page: import("@playwright/test").Page) {
 test.describe("Início", () => {
   test("'Deixar o modelo escolher' leva direto pro treino, com o critério do modelo (P2)", async ({ page }) => {
     await entrar(page);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("Marina");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Estude para o ENEM com a ajuda do Gabaritei.");
     await page.getByRole("button", { name: "Deixar o modelo escolher" }).click();
     await page.waitForURL(/\/treino\/.+/);
     await expect(page.getByText("Recomendado pelo modelo")).toBeVisible();
@@ -26,10 +26,14 @@ test.describe("Início", () => {
   test("sem atividade em andamento, 'Começar treino' leva pra escolha de modo (P2)", async ({ page }) => {
     await page.addInitScript(() => window.localStorage.setItem("gabaritei:mock:cenario", "novo"));
     await entrar(page);
-    await expect(page.getByRole("heading", { name: "Por onde começar" })).toBeVisible();
-    await expect(page.getByLabel("Tema (opcional)")).toBeVisible();
-    await page.getByRole("button", { name: "Começar treino" }).first().click();
+    // Início novo: "Por onde começar" saiu do Início (virou o cartão "Primeiro
+    // passo" de "Seu próximo passo"); a escolha de tema/habilidade/nível agora
+    // só existe mesmo na tela /treino, pra onde o botão leva.
+    await expect(page.getByText("Primeiro passo")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Começar treino" })).toBeVisible();
+    await page.getByRole("button", { name: "Começar treino" }).click();
     await page.waitForURL("**/treino");
+    await expect(page.getByLabel("Tema (opcional)")).toBeVisible();
   });
 });
 

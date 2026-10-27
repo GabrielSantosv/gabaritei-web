@@ -34,6 +34,12 @@
   --color-area-lc: var(--area-lc);
   --color-area-lc-soft: var(--area-lc-soft);
   --color-focus: var(--focus);
+  /* docs/FRONTEND_IDENTIDADE.md, seção 5.1: apelidos da faixa (valores em tokens.css) */
+  --color-band: var(--band);
+  --color-on-band: var(--on-band);
+  --color-on-band-2: var(--on-band-2);
+  --color-band-btn: var(--band-btn);
+  --color-on-band-btn: var(--on-band-btn);
 
   /* tipografia: seção 6 — Source Serif 4 (editorial), IBM Plex Sans (interface), IBM Plex Mono (dados técnicos) */
   --font-serif: var(--font-source-serif-4), ui-serif, serif;
