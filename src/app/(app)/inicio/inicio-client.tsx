@@ -128,18 +128,19 @@ const DESCRICAO_ABA: Partial<Record<string, string>> = {
 function LinhaAba({ href, rotulo, desc, Icone }: { href: string; rotulo: string; desc: string; Icone: typeof Zap }) {
   return (
     <li className="border-b border-rule">
+      {/* Nome acessível: nome mais descrição (seção "O que cada aba faz") — vem
+          do próprio texto visível, em ordem de leitura, sem aria-label. Um
+          aria-label junto de texto visível dispara "label-content-name-mismatch"
+          no axe quando as palavras não ficam concatenadas exatamente iguais. */}
       <NextLink
         href={href}
-        aria-label={`${rotulo}: ${desc}`}
         className="flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-xs py-4 text-ink no-underline hover:bg-paper-2 motion-safe-transition sm:min-h-[4.75rem] sm:flex-nowrap sm:gap-x-6 sm:py-3.5"
       >
-        <span aria-hidden="true" className="order-1 flex min-h-11 flex-1 items-center gap-3 sm:order-none sm:w-56 sm:flex-none">
-          <Icone className="size-[1.625rem] shrink-0 text-brand" strokeWidth={1.75} />
+        <span className="order-1 flex min-h-11 flex-1 items-center gap-3 sm:order-none sm:w-56 sm:flex-none">
+          <Icone className="size-[1.625rem] shrink-0 text-brand" strokeWidth={1.75} aria-hidden="true" />
           <span className="font-display text-xl font-semibold text-ink sm:text-[1.5rem]">{rotulo}</span>
         </span>
-        <span aria-hidden="true" className="order-3 w-full text-base text-ink-2 sm:order-none sm:w-auto sm:flex-1">
-          {desc}
-        </span>
+        <span className="order-3 w-full text-base text-ink-2 sm:order-none sm:w-auto sm:flex-1">{desc}</span>
         <ChevronRight className="order-2 size-5 shrink-0 text-ink-2 sm:order-none" strokeWidth={1.75} aria-hidden="true" />
       </NextLink>
     </li>
